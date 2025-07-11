@@ -73,17 +73,17 @@ const kpis = [
 ]
 
 const vehicleStatus = [
-  { id: "MT-3401", driver: "Alex Ray", location: "Downtown Core", status: "On Route", capacity: "85%" },
-  { id: "MT-2198", driver: "Sasha Smith", location: "North Suburbs", status: "Idle", capacity: "0%" },
-  { id: "MT-5527", driver: "Chen Wei", location: "Depot", status: "Maintenance", capacity: "0%" },
-  { id: "MT-4815", driver: "Maria Garcia", location: "East Business Park", status: "On Route", capacity: "60%" },
-  { id: "MT-6002", driver: "John Doe", location: "Westside Hub", status: "Idle", capacity: "0%" },
+  { id: "MT-3401", driver: "Adekunle Adebayo", location: "Lekki Phase 1", status: "On Route", capacity: "85%" },
+  { id: "MT-2198", driver: "Aisha Bello", location: "Chevron Drive", status: "Idle", capacity: "0%" },
+  { id: "MT-5527", driver: "Emeka Okafor", location: "Depot (Ajah)", status: "Maintenance", capacity: "0%" },
+  { id: "MT-4815", driver: "Fatima Sani", location: "VGC", status: "On Route", capacity: "60%" },
+  { id: "MT-6002", driver: "Yusuf Ibrahim", location: "Jakande", status: "Idle", capacity: "0%" },
 ]
 
 const pickupRequests = [
-    { name: "Eleanor Vance", from: "123 Maple St", to: "Central Station", time: "10:15 AM" },
-    { name: "Marcus Holloway", from: "456 Oak Ave", to: "Tech Park", time: "10:30 AM" },
-    { name: "Nina Patel", from: "789 Pine Ln", to: "City Hospital", time: "10:45 AM" },
+    { name: "Chioma Okoro", from: "Ikate Elegushi", to: "Ajah Market", time: "10:15 AM" },
+    { name: "Tunde Adeyemi", from: "Abraham Adesanya", to: "Lekki Toll Gate", time: "10:30 AM" },
+    { name: "Bolanle Williams", from: "Sangotedo", to: "Admiralty Way", time: "10:45 AM" },
 ]
 
 const maintenanceSchedule = [
@@ -228,14 +228,14 @@ export default function DashboardPage() {
                       <CardTitle>Sequential Drop-off Route</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">Route 7B: Downtown Express</p>
+                        <p className="text-sm text-muted-foreground mb-4">Route 7B: Lekki-Ajah Express</p>
                         <ol className="space-y-4">
                           {[
-                              { stop: 1, name: "Central Station", time: "10:05 AM", status: "completed" },
-                              { stop: 2, name: "Grand Library", time: "10:12 AM", status: "completed" },
-                              { stop: 3, name: "City Hall", time: "10:20 AM", status: "current" },
-                              { stop: 4, name: "Market District", time: "10:35 AM", status: "upcoming" },
-                              { stop: 5, name: "Waterfront Park", time: "10:45 AM", status: "upcoming" },
+                              { stop: 1, name: "Lekki Phase 1", time: "10:05 AM", status: "completed" },
+                              { stop: 2, name: "Chevron", time: "10:12 AM", status: "completed" },
+                              { stop: 3, name: "VGC", time: "10:20 AM", status: "current" },
+                              { stop: 4, name: "Abraham Adesanya", time: "10:35 AM", status: "upcoming" },
+                              { stop: 5, name: "Ajah Bustop", time: "10:45 AM", status: "upcoming" },
                           ].map((item) => (
                               <li key={item.stop} className="flex items-start gap-3">
                                   <div className={`flex size-8 items-center justify-center rounded-full ${item.status === 'completed' ? 'bg-primary/20 text-primary' : item.status === 'current' ? 'bg-accent text-accent-foreground' : 'bg-secondary'}`}>
