@@ -4,7 +4,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Fuel } from "lucide-react";
-import BusesLayout from "../layout";
 
 const fuelData = [
   { busId: "MT-3401", date: "2024-07-29", kmDriven: 152.3, fuelAdded: 30.5, mpg: 4.99 },
@@ -16,39 +15,37 @@ const fuelData = [
 
 export default function FuelMonitoringPage() {
   return (
-    <BusesLayout pageTitle="Fuel Monitoring by KM">
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Fuel className="size-5 text-primary"/>Fuel Consumption Records</CardTitle>
-                <CardDescription>
-                    Review fuel consumption records for each bus based on kilometers driven.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Bus ID</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>KM Driven</TableHead>
-                            <TableHead>Fuel Added (Liters)</TableHead>
-                            <TableHead>KM per Liter</TableHead>
+    <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Fuel className="size-5 text-primary"/>Fuel Consumption Records</CardTitle>
+            <CardDescription>
+                Review fuel consumption records for each bus based on kilometers driven.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Bus ID</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>KM Driven</TableHead>
+                        <TableHead>Fuel Added (Liters)</TableHead>
+                        <TableHead>KM per Liter</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {fuelData.map((record) => (
+                        <TableRow key={record.busId + record.date}>
+                            <TableCell>{record.busId}</TableCell>
+                            <TableCell>{record.date}</TableCell>
+                            <TableCell>{record.kmDriven.toFixed(1)}</TableCell>
+                            <TableCell>{record.fuelAdded.toFixed(1)}</TableCell>
+                            <TableCell>{record.mpg.toFixed(2)}</TableCell>
                         </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {fuelData.map((record) => (
-                            <TableRow key={record.busId + record.date}>
-                                <TableCell>{record.busId}</TableCell>
-                                <TableCell>{record.date}</TableCell>
-                                <TableCell>{record.kmDriven.toFixed(1)}</TableCell>
-                                <TableCell>{record.fuelAdded.toFixed(1)}</TableCell>
-                                <TableCell>{record.mpg.toFixed(2)}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
-    </BusesLayout>
+                    ))}
+                </TableBody>
+            </Table>
+        </CardContent>
+    </Card>
   );
 }

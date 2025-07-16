@@ -40,13 +40,16 @@ import { usePathname } from "next/navigation"
 
 export default function BusesLayout({
   children,
-  pageTitle,
 }: {
   children: React.ReactNode;
-  pageTitle: string;
 }) {
   const pathname = usePathname();
 
+  let pageTitle = "Bus Management";
+  if (pathname === '/buses/maintenance') pageTitle = "Vehicle Maintenance";
+  if (pathname === '/buses/operations') pageTitle = "Daily Operations";
+  if (pathname === '/buses/fuel') pageTitle = "Fuel Monitoring";
+  
   return (
     <div className="min-h-screen w-full bg-muted/40">
       <SidebarProvider>
