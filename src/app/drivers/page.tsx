@@ -216,4 +216,20 @@ export default function DriversPage() {
                                           <SelectItem value="Active">Active</SelectItem>
                                           <SelectItem value="Available">Available</SelectItem>
                                           <SelectItem value="On Leave">On Leave</SelectItem>
-                                          <SelectItem value="Outsourced">Outsourced</
+                                          <SelectItem value="Outsourced">Outsourced</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                  <Button>Update</Button>
+                              </TableCell>
+                          </TableRow>
+                      ))}
+                  </TableBody>
+              </Table>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}
