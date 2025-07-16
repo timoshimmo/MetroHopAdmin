@@ -552,7 +552,7 @@ const SidebarMenuButton = React.forwardRef<
         {...(href && !hasSubMenu && { asChild: true })}
         {...props}
       >
-        {hasSubMenu || (asChild && !href) ? children : href ? <a href={href}>{children}</a> : children}
+        {hasSubMenu || (asChild && !href) ? children : href ? <a href={href} className="flex w-full items-center gap-2">{children}</a> : children}
       </Comp>
     )
 
