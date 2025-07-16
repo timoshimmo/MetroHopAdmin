@@ -53,29 +53,59 @@ const mapStyles = [
       }
 ];
 
-const Polylines = ({ routes }: { routes: Route[] }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!map || !routes.length) return;
-
-    const polylines = routes.map(route => {
-      const p = new google.maps.Polyline({
-        path: route.path,
-        strokeColor: route.color,
-        strokeOpacity: 0.8,
-        strokeWeight: 5,
-      });
-      p.setMap(map);
-      return p;
-    });
+const Directions = ({ routes }: { routes: Route[] }) => {
+    const map = useMap();
     
-    return () => {
-      polylines.forEach(p => p.setMap(null));
-    };
-  }, [map, routes]);
+    useEffect(() => {
+        if (!map || !routes.length) return;
 
-  return null;
+        const directionsService = new google.maps.DirectionsService();
+        const polylines: google.maps.Polyline[] = [];
+
+        routes.forEach(route => {
+            if (route.path.length < 2) return;
+
+            const directionsRenderer = new google.maps.DirectionsRenderer({
+                map,
+                suppressMarkers: true, // We'll use our own AdvancedMarkers
+                polylineOptions: {
+                    strokeColor: route.color,
+                    strokeOpacity: 0.8,
+                    strokeWeight: 5,
+                }
+            });
+
+            const origin = route.path[0];
+            const destination = route.path[route.path.length - 1];
+            const waypoints = route.path.slice(1, -1).map(point => ({
+                location: point,
+                stopover: true,
+            }));
+
+            directionsService.route({
+                origin,
+                destination,
+                waypoints,
+                travelMode: google.maps.TravelMode.DRIVING,
+            }, (result, status) => {
+                if (status === google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                } else {
+                    console.error(`Directions request failed due to ${status} for route ${route.name}`);
+                }
+            });
+
+            // Store the renderer to clean up later, though the renderer cleans itself up when map is destroyed
+            // For more complex scenarios, you might want a more robust cleanup.
+        });
+
+        return () => {
+            // In this setup, DirectionsRenderer cleans up after itself when the map changes.
+            // If we were creating polylines manually from the response, we'd clear them here.
+        };
+    }, [map, routes]);
+
+    return null;
 };
 
 
@@ -101,7 +131,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 disableDefaultUI={true}
                 gestureHandling={'greedy'}
             >
-                <Polylines routes={allRoutes} />
+                <Directions routes={allRoutes} />
                  {allRoutes.flatMap(route => route.path.map((pos, index) => (
                     <AdvancedMarker key={`${route.name}-${index}`} position={pos}>
                         <div style={{
