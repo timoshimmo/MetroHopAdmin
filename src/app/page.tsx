@@ -117,7 +117,7 @@ export default function DashboardPage() {
               <SidebarMenuItem>
                 <SidebarMenuButton href="#" isActive>
                   <LayoutDashboard />
-                  Dashboard
+                  <span>Dashboard</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -338,7 +338,7 @@ export default function DashboardPage() {
                         <CardHeader className="flex flex-row items-center gap-2">
                             <ArrowRightLeft className="size-5 text-primary" />
                             <CardTitle>Outsourced Drivers</CardTitle>
-                        </CardHeader>
+                        </Header>
                         <CardContent>
                              <Table>
                                 <TableHeader><TableRow><TableHead>Driver</TableHead><TableHead>Company</TableHead><TableHead>Contract End</TableHead></TableRow></TableHeader>
