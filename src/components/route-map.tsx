@@ -73,8 +73,6 @@ const Directions = ({ routes }: { routes: Route[] }) => {
         routes.forEach(route => {
             if (route.path.length < 2) return;
             
-            // This renderer will be replaced for each route, which is fine for this use case
-            // A more complex implementation might manage an array of renderers.
             const directionsRenderer = new google.maps.DirectionsRenderer({
                 map,
                 suppressMarkers: true, 
@@ -113,10 +111,88 @@ const Directions = ({ routes }: { routes: Route[] }) => {
     return null;
 };
 
+// Function to interpolate between two points
+function interpolateLatLng(p1: LatLng, p2: LatLng, fraction: number): LatLng {
+    const lat = p1.lat + (p2.lat - p1.lat) * fraction;
+    const lng = p1.lng + (p2.lng - p1.lng) * fraction;
+    return { lat, lng };
+}
+
 
 export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string} | null>(null);
+    const [busPositions, setBusPositions] = useState<Record<string, LatLng>>({});
+
+    useEffect(() => {
+        const activeRoutes = allRoutes.filter(r => r.status === 'Active' && r.path.length > 1);
+
+        const initialPositions: Record<string, LatLng> = {};
+        activeRoutes.forEach(route => {
+            initialPositions[route.name] = route.path[0];
+        });
+        setBusPositions(initialPositions);
+
+        const animationInterval = setInterval(() => {
+            setBusPositions(prevPositions => {
+                const newPositions = { ...prevPositions };
+                activeRoutes.forEach(route => {
+                    const currentPos = newPositions[route.name];
+                    const path = route.path;
+
+                    // Find current segment
+                    let currentSegmentIndex = path.findIndex((p, i) => {
+                         if (i === path.length - 1) return false;
+                         const p1 = p;
+                         const p2 = path[i+1];
+                         // check if currentPos is on the segment from p1 to p2
+                         const isBetweenLat = (currentPos.lat >= Math.min(p1.lat, p2.lat) && currentPos.lat <= Math.max(p1.lat, p2.lat));
+                         const isBetweenLng = (currentPos.lng >= Math.min(p1.lng, p2.lng) && currentPos.lng <= Math.max(p1.lng, p2.lng));
+                         return isBetweenLat && isBetweenLng;
+                    });
+                    
+                    if(currentSegmentIndex === -1) {
+                        // If not found (or at the start), default to the first segment
+                        currentSegmentIndex = 0;
+                    }
+                    
+                    const startPoint = path[currentSegmentIndex];
+                    let nextPoint = path[currentSegmentIndex + 1];
+
+                    if (!nextPoint) { // Reached the end of the route
+                        newPositions[route.name] = path[0]; // Loop back to the start
+                        return;
+                    }
+
+                    // Simple fixed step for movement
+                    const step = 0.05; // Adjust for speed
+                    
+                    const totalDistLat = nextPoint.lat - startPoint.lat;
+                    const totalDistLng = nextPoint.lng - startPoint.lng;
+                    const currentDistLat = currentPos.lat - startPoint.lat;
+                    const currentDistLng = currentPos.lng - startPoint.lng;
+
+                    const fraction = Math.sqrt(currentDistLat**2 + currentDistLng**2) / Math.sqrt(totalDistLat**2 + totalDistLng**2);
+                    
+                    let newFraction = fraction + step;
+
+                    if (newFraction >= 1.0) {
+                        // Move to the next segment
+                        const nextSegmentIndex = (currentSegmentIndex + 1) % (path.length -1);
+                        newPositions[route.name] = path[nextSegmentIndex];
+                         if (currentSegmentIndex + 1 >= path.length -1) {
+                             newPositions[route.name] = path[0]
+                         }
+                    } else {
+                        newPositions[route.name] = interpolateLatLng(startPoint, nextPoint, newFraction);
+                    }
+                });
+                return newPositions;
+            });
+        }, 1000); // Update every second
+
+        return () => clearInterval(animationInterval);
+    }, [allRoutes]);
 
     if (!apiKey) {
         return (
@@ -142,17 +218,17 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 <Directions routes={allRoutes} />
                 
                 {allRoutes.flatMap(route => 
-                    (route.stops || route.path).map((stopOrPos, index) => {
-                        const position = 'lat' in stopOrPos ? stopOrPos : { lat: 0, lng: 0 }; // Fallback for path items
-                        const stop = route.stops ? route.stops[index] : null;
-                        const pos = stop ? route.path[index] : position;
-                        const name = stop ? stop.name : `Point ${index + 1}`;
-
+                    (route.stops || []).map((stop, index) => {
+                        const pos = route.path[index] || { lat: 0, lng: 0 };
+                        
                         return (
                             <AdvancedMarker 
-                                key={`${route.name}-${index}`} 
+                                key={`${route.name}-${stop.name}-${index}`} 
                                 position={pos}
-                                onClick={() => setSelectedStop({route, stop: pos, name})}
+                                onClick={(e) => {
+                                    e.stopPropagation(); // prevent map click from firing
+                                    setSelectedStop({route, stop: pos, name: stop.name});
+                                }}
                             >
                                 <div style={{
                                     width: 12,
@@ -168,9 +244,9 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                     })
                 )}
 
-                {allRoutes.map((route, index) => {
-                    if (route.status === 'Active' && route.path.length > 0) {
-                        return <BusMarker key={`bus-${index}`} position={route.path[0]} color={route.color} />;
+                {allRoutes.map((route) => {
+                    if (route.status === 'Active' && busPositions[route.name]) {
+                        return <BusMarker key={`bus-${route.name}`} position={busPositions[route.name]} color={route.color} />;
                     }
                     return null;
                 })}
