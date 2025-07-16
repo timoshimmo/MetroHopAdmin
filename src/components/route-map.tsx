@@ -4,6 +4,7 @@
 import { APIProvider, Map, AdvancedMarker, useMap, InfoWindow } from '@vis.gl/react-google-maps';
 import React, { useEffect, useState } from 'react';
 import { MapPin } from 'lucide-react';
+import { BusMarker } from './bus-marker';
 
 type LatLng = { lat: number; lng: number };
 
@@ -157,6 +158,13 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                         )
                     })
                 )}
+
+                {allRoutes.map(route => {
+                    if (route.status === 'Active' && route.path.length > 0) {
+                        return <BusMarker key={`${route.name}-bus`} position={route.path[0]} color={route.color} />;
+                    }
+                    return null;
+                })}
                 
                 {selectedStop && (
                     <InfoWindow
