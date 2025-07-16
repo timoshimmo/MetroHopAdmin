@@ -1,7 +1,7 @@
 
 'use client'
 
-import React from "react";
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Briefcase, Bus, PlusCircle, UserCog, UserCheck, UserX, Users } from "lucide-react";
 
-const drivers = [
+const initialDrivers = [
   { id: "D-001", name: "Adekunle Adebayo", license: "LIC-123456", contact: "08012345678", assignedBus: "MT-3401", status: "Active" },
   { id: "D-002", name: "Aisha Bello", license: "LIC-789012", contact: "08023456789", assignedBus: "MT-2198", status: "Active" },
   { id: "D-003", name: "Fatima Sani", license: "LIC-345678", contact: "08034567890", assignedBus: "MT-4815", status: "Active" },
@@ -22,14 +22,17 @@ const drivers = [
   { id: "D-007", name: "Kenji Tanaka", license: "LIC-445566", contact: "N/A", assignedBus: "N/A", status: "Outsourced" },
 ];
 
-const availableDrivers = drivers.filter(d => d.status === 'Available' || d.status === 'On Leave');
-
 const availableBuses = [
     { busId: "MT-6002", name: "Jakande Commuter" },
     { busId: "MT-1088", name: "VGC Shuttle" },
 ];
 
 export default function DriversPage() {
+  const [drivers, setDrivers] = useState(initialDrivers);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newDriver, setNewDriver] = useState({ name: "", license: "", contact: "" });
+
+  const availableDrivers = drivers.filter(d => d.status === 'Available' || d.status === 'On Leave');
 
   const totalDrivers = drivers.length;
   const activeDrivers = drivers.filter(d => d.status === 'Active').length;
@@ -42,6 +45,28 @@ export default function DriversPage() {
     { title: "Idle / On Leave", value: idleDrivers, icon: UserX },
     { title: "Outsourced Drivers", value: outsourcedDrivers, icon: Briefcase },
   ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setNewDriver(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleAddDriver = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newDriver.name && newDriver.license && newDriver.contact) {
+      const newEntry = {
+        id: `D-${String(drivers.length + 1).padStart(3, '0')}`,
+        name: newDriver.name,
+        license: newDriver.license,
+        contact: newDriver.contact,
+        assignedBus: "N/A",
+        status: "Available",
+      };
+      setDrivers(prev => [newEntry, ...prev]);
+      setNewDriver({ name: "", license: "", contact: "" });
+      setIsDialogOpen(false);
+    }
+  };
 
   return (
     <div className="grid gap-6">
@@ -67,7 +92,7 @@ export default function DriversPage() {
               View and manage all drivers in the system.
             </CardDescription>
           </div>
-          <Dialog>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <PlusCircle className="mr-2" />
@@ -81,29 +106,31 @@ export default function DriversPage() {
                   Enter the details of the new driver to add them to the system.
                 </DialogDescription>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Name
-                  </Label>
-                  <Input id="name" placeholder="e.g. John Doe" className="col-span-3" />
+              <form onSubmit={handleAddDriver}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input id="name" placeholder="e.g. John Doe" className="col-span-3" value={newDriver.name} onChange={handleInputChange} required/>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="license" className="text-right">
+                      License No.
+                    </Label>
+                    <Input id="license" placeholder="e.g. LIC-123456" className="col-span-3" value={newDriver.license} onChange={handleInputChange} required/>
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="contact" className="text-right">
+                      Contact
+                    </Label>
+                    <Input id="contact" placeholder="e.g. 08012345678" className="col-span-3" value={newDriver.contact} onChange={handleInputChange} required/>
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="license" className="text-right">
-                    License No.
-                  </Label>
-                  <Input id="license" placeholder="e.g. LIC-123456" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="contact" className="text-right">
-                    Contact
-                  </Label>
-                  <Input id="contact" placeholder="e.g. 08012345678" className="col-span-3" />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit">Add Driver</Button>
-              </DialogFooter>
+                <DialogFooter>
+                  <Button type="submit">Add Driver</Button>
+                </DialogFooter>
+              </form>
             </DialogContent>
           </Dialog>
         </CardHeader>

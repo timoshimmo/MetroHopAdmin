@@ -4,13 +4,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DollarSign, ListOrdered, Map, PlusCircle, Route } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { RouteMap } from "@/components/route-map";
 
-const routes = {
+const initialRoutes = {
   "7B": {
     name: "Lekki-Ajah Express",
     color: "#FF5733", // Red-Orange
@@ -83,8 +86,39 @@ const tripFares = [
 ];
 
 export default function RoutesPage() {
-    const [selectedRouteId, setSelectedRouteId] = React.useState<keyof typeof routes>("7B");
+    const [routes, setRoutes] = useState(initialRoutes);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newRoute, setNewRoute] = useState({ id: "", name: "", busesAssigned: "" });
+    const [selectedRouteId, setSelectedRouteId] = useState<keyof typeof routes>("7B");
+    
     const selectedRoute = routes[selectedRouteId];
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = e.target;
+        setNewRoute(prev => ({ ...prev, [id]: value }));
+    };
+
+    const handleAddRoute = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newRoute.id && newRoute.name && newRoute.busesAssigned) {
+            const newEntry = {
+                [newRoute.id]: {
+                    name: newRoute.name,
+                    color: `#${Math.floor(Math.random()*16777215).toString(16)}`,
+                    path: [ // Dummy path, can be improved
+                        { lat: 6.45, lng: 3.55 },
+                        { lat: 6.46, lng: 3.56 },
+                    ],
+                    stops: [],
+                    status: "Active",
+                    busesAssigned: Number(newRoute.busesAssigned),
+                }
+            };
+            setRoutes(prev => ({ ...prev, ...newEntry }));
+            setNewRoute({ id: "", name: "", busesAssigned: "" });
+            setIsDialogOpen(false);
+        }
+    };
 
     return (
         <div className="grid gap-6">
@@ -96,10 +130,41 @@ export default function RoutesPage() {
                             Manage and view all bus routes.
                         </CardDescription>
                     </div>
-                    <Button>
-                        <PlusCircle className="mr-2" />
-                        Add New Route
-                    </Button>
+                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <PlusCircle className="mr-2" />
+                                Add New Route
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Add New Route</DialogTitle>
+                                <DialogDescription>
+                                    Enter details for the new bus route.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <form onSubmit={handleAddRoute}>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="id" className="text-right">Route ID</Label>
+                                        <Input id="id" placeholder="e.g. 15B" className="col-span-3" value={newRoute.id} onChange={handleInputChange} required />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="name" className="text-right">Route Name</Label>
+                                        <Input id="name" placeholder="e.g. Marina Line" className="col-span-3" value={newRoute.name} onChange={handleInputChange} required />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="busesAssigned" className="text-right">Buses Assigned</Label>
+                                        <Input id="busesAssigned" type="number" placeholder="e.g. 3" className="col-span-3" value={newRoute.busesAssigned} onChange={handleInputChange} required />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <Button type="submit">Add Route</Button>
+                                </DialogFooter>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
                 </CardHeader>
                 <CardContent>
                     <Table>
@@ -113,7 +178,7 @@ export default function RoutesPage() {
                         </TableHeader>
                         <TableBody>
                             {Object.entries(routes).map(([id, route]) => (
-                                <TableRow key={id}>
+                                <TableRow key={id} onClick={() => setSelectedRouteId(id)} className="cursor-pointer">
                                     <TableCell>
                                         <div className="flex items-center gap-2">
                                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: route.color }} />
@@ -178,20 +243,26 @@ export default function RoutesPage() {
                     </Select>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-sm text-muted-foreground mb-4">Displaying stops for Route {selectedRouteId}: {selectedRoute.name}</p>
-                    <ol className="space-y-4">
-                        {selectedRoute.stops.map((item) => (
-                            <li key={item.stop} className="flex items-start gap-3">
-                                <div className={`flex size-8 items-center justify-center rounded-full ${item.status === 'completed' ? 'bg-primary/20 text-primary' : item.status === 'current' ? 'bg-accent text-accent-foreground' : 'bg-secondary'}`}>
-                                    {item.stop}
-                                </div>
-                                <div>
-                                    <p className="font-semibold">{item.name}</p>
-                                    <p className="text-sm text-muted-foreground">{item.time}</p>
-                                </div>
-                            </li>
-                        ))}
-                    </ol>
+                    {selectedRoute ? (
+                        <>
+                            <p className="text-sm text-muted-foreground mb-4">Displaying stops for Route {selectedRouteId}: {selectedRoute.name}</p>
+                            <ol className="space-y-4">
+                                {selectedRoute.stops.map((item) => (
+                                    <li key={item.stop} className="flex items-start gap-3">
+                                        <div className={`flex size-8 items-center justify-center rounded-full ${item.status === 'completed' ? 'bg-primary/20 text-primary' : item.status === 'current' ? 'bg-accent text-accent-foreground' : 'bg-secondary'}`}>
+                                            {item.stop}
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold">{item.name}</p>
+                                            <p className="text-sm text-muted-foreground">{item.time}</p>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ol>
+                        </>
+                    ) : (
+                        <p>Select a route to see details.</p>
+                    )}
                 </CardContent>
                 </Card>
             </div>
@@ -229,5 +300,3 @@ export default function RoutesPage() {
         </div>
     )
 }
-
-    
