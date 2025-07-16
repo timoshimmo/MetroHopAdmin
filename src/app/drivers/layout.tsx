@@ -91,7 +91,7 @@ export default function DriversLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
+                <SidebarMenuButton href="/support">
                   <Headset />
                   Support
                 </SidebarMenuButton>

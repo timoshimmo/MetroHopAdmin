@@ -230,7 +230,7 @@ export default function DashboardPage() {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
+                <SidebarMenuButton href="/support">
                   <Headset />
                   Support
                 </SidebarMenuButton>

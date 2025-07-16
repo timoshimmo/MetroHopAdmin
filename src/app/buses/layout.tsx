@@ -95,7 +95,7 @@ export default function BusesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
+                <SidebarMenuButton href="/support">
                   <Headset />
                   Support
                 </SidebarMenuButton>

@@ -95,7 +95,7 @@ export default function MaintenanceLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
+                <SidebarMenuButton href="/support">
                   <Headset />
                   Support
                 </SidebarMenuButton>

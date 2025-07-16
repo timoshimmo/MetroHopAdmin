@@ -21,13 +21,9 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import {
   Bus,
-  ChevronDown,
   Headset,
   LayoutDashboard,
   LogOut,
@@ -38,14 +34,14 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-export default function RoutesLayout({
+export default function SupportLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
-  let pageTitle = "Routes";
+  const pageTitle = "Support";
   
   return (
     <div className="min-h-screen w-full bg-muted/40">
@@ -77,7 +73,7 @@ export default function RoutesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/routes" isActive={pathname.startsWith('/routes')}>
+                <SidebarMenuButton href="/routes">
                   <Route />
                   Routes
                 </SidebarMenuButton>
@@ -95,7 +91,7 @@ export default function RoutesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/support">
+                <SidebarMenuButton href="/support" isActive={pathname.startsWith('/support')}>
                   <Headset />
                   Support
                 </SidebarMenuButton>
