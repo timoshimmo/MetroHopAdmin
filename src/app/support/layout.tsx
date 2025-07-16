@@ -42,7 +42,10 @@ export default function SupportLayout({
 }) {
   const pathname = usePathname();
 
-  const pageTitle = "Support";
+  let pageTitle = "Support";
+  if (pathname === '/support/new') {
+    pageTitle = "New Support Case";
+  }
   
   return (
     <div className="min-h-screen w-full bg-muted/40">

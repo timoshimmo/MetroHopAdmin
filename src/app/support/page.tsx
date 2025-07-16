@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Headset, PlusCircle } from "lucide-react";
+import Link from "next/link";
 
 const supportCases = [
   { id: "C-1024", customer: "Adebayo Adekunle", date: "2024-08-01", type: "Complaint", details: "Bus MT-3401 was 20 minutes late.", status: "Resolved", assignedTo: "Support Team A" },
@@ -26,9 +27,11 @@ export default function SupportPage() {
                     Track and manage customer complaints and feedback.
                 </CardDescription>
             </div>
-            <Button>
-                <PlusCircle className="mr-2" />
-                New Case
+            <Button asChild>
+                <Link href="/support/new">
+                    <PlusCircle className="mr-2" />
+                    New Case
+                </Link>
             </Button>
         </CardHeader>
         <CardContent>
