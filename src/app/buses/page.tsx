@@ -4,7 +4,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Users } from "lucide-react";
+import { Bus, Users } from "lucide-react";
 
 const dailyOperations = [
   { busId: "MT-3401", driver: "Adekunle Adebayo", status: "On Route", assignment: "Lekki-Ajah Express" },
@@ -14,6 +14,15 @@ const dailyOperations = [
   { busId: "MT-1088", driver: "Chidi Nwosu", status: "Available", assignment: "N/A" },
   { busId: "MT-5527", driver: "Emeka Okafor", status: "Maintenance", assignment: "N/A" },
 ];
+
+const vehicleStatus = [
+  { id: "MT-3401", driver: "Adekunle Adebayo", location: "Lekki Phase 1", status: "On Route", occupancy: "85%", seatCapacity: "60 Seater" },
+  { id: "MT-2198", driver: "Aisha Bello", location: "Chevron Drive", status: "Idle", occupancy: "0%", seatCapacity: "60 Seater" },
+  { id: "MT-5527", driver: "Emeka Okafor", location: "Depot (Ajah)", status: "Maintenance", occupancy: "0%", seatCapacity: "45 Seater" },
+  { id: "MT-4815", driver: "Fatima Sani", location: "VGC", status: "On Route", occupancy: "60%", seatCapacity: "60 Seater" },
+  { id: "MT-6002", driver: "Yusuf Ibrahim", location: "Jakande", status: "Idle", occupancy: "0%", seatCapacity: "45 Seater" },
+];
+
 
 export default function BusesPage() {
   return (
@@ -49,6 +58,40 @@ export default function BusesPage() {
                             </TableRow>
                         ))}
                     </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center gap-2">
+                <Bus className="size-5 text-primary"/>
+                <CardTitle>Live Vehicle Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                <TableHeader>
+                    <TableRow>
+                    <TableHead>Bus ID</TableHead>
+                    <TableHead>Driver</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Occupancy</TableHead>
+                    <TableHead>Seat Capacity</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {vehicleStatus.map((vehicle) => (
+                    <TableRow key={vehicle.id}>
+                        <TableCell className="font-medium">{vehicle.id}</TableCell>
+                        <TableCell>{vehicle.driver}</TableCell>
+                        <TableCell>{vehicle.location}</TableCell>
+                        <TableCell>
+                        <Badge variant={vehicle.status === 'On Route' ? 'default' : vehicle.status === 'Idle' ? 'secondary' : 'destructive'} className={vehicle.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>{vehicle.status}</Badge>
+                        </TableCell>
+                        <TableCell>{vehicle.occupancy}</TableCell>
+                        <TableCell>{vehicle.seatCapacity}</TableCell>
+                    </TableRow>
+                    ))}
+                </TableBody>
                 </Table>
             </CardContent>
         </Card>

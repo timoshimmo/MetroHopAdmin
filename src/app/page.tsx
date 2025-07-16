@@ -87,11 +87,11 @@ const kpis = [
 ];
 
 const vehicleStatus = [
-  { id: "MT-3401", driver: "Adekunle Adebayo", location: "Lekki Phase 1", status: "On Route", capacity: "85%" },
-  { id: "MT-2198", driver: "Aisha Bello", location: "Chevron Drive", status: "Idle", capacity: "0%" },
-  { id: "MT-5527", driver: "Emeka Okafor", location: "Depot (Ajah)", status: "Maintenance", capacity: "0%" },
-  { id: "MT-4815", driver: "Fatima Sani", location: "VGC", status: "On Route", capacity: "60%" },
-  { id: "MT-6002", driver: "Yusuf Ibrahim", location: "Jakande", status: "Idle", capacity: "0%" },
+  { id: "MT-3401", driver: "Adekunle Adebayo", location: "Lekki Phase 1", status: "On Route", occupancy: "85%", seatCapacity: "60 Seater" },
+  { id: "MT-2198", driver: "Aisha Bello", location: "Chevron Drive", status: "Idle", occupancy: "0%", seatCapacity: "60 Seater" },
+  { id: "MT-5527", driver: "Emeka Okafor", location: "Depot (Ajah)", status: "Maintenance", occupancy: "0%", seatCapacity: "45 Seater" },
+  { id: "MT-4815", driver: "Fatima Sani", location: "VGC", status: "On Route", occupancy: "60%", seatCapacity: "60 Seater" },
+  { id: "MT-6002", driver: "Yusuf Ibrahim", location: "Jakande", status: "Idle", occupancy: "0%", seatCapacity: "45 Seater" },
 ];
 
 const pickupRequests = [
@@ -360,7 +360,8 @@ export default function DashboardPage() {
                             <TableHead>Driver</TableHead>
                             <TableHead>Location</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Capacity</TableHead>
+                            <TableHead>Occupancy</TableHead>
+                            <TableHead>Seat Capacity</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -372,7 +373,8 @@ export default function DashboardPage() {
                               <TableCell>
                                 <Badge variant={vehicle.status === 'On Route' ? 'default' : vehicle.status === 'Idle' ? 'secondary' : 'destructive'} className={vehicle.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>{vehicle.status}</Badge>
                               </TableCell>
-                              <TableCell>{vehicle.capacity}</TableCell>
+                              <TableCell>{vehicle.occupancy}</TableCell>
+                              <TableCell>{vehicle.seatCapacity}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
