@@ -168,7 +168,7 @@ const routes = {
   "5C": {
     name: "Admiralty Commuter",
     color: "#8E44AD",
-    status: "Inactive",
+    status: "Active",
     path: [
       { lat: 6.4450, lng: 3.4699 },
       { lat: 6.4528, lng: 3.4400 },

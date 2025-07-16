@@ -68,8 +68,8 @@ const routes = {
       { stop: 4, name: "Lekki Arts & Crafts Market", time: "10:05 AM", status: "current" },
       { stop: 5, name: "Elegushi Beach", time: "10:15 AM", status: "upcoming" },
     ],
-    status: "Inactive",
-    busesAssigned: 0,
+    status: "Active",
+    busesAssigned: 1,
   },
 };
 
