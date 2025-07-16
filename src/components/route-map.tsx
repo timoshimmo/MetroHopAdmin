@@ -113,7 +113,7 @@ const Directions = ({ routes }: { routes: Route[] }) => {
 
 export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string} | null>(null);
+    const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string, stopNumber: number} | null>(null);
 
     if (!apiKey) {
         return (
@@ -148,7 +148,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                                 position={pos}
                                 onClick={(e) => {
                                     e.stopPropagation(); // prevent map click from firing
-                                    setSelectedStop({route, stop: pos, name: stop.name});
+                                    setSelectedStop({route, stop: pos, name: stop.name, stopNumber: stop.stop});
                                 }}
                             >
                                 <MapPin className="text-red-500 w-8 h-8 cursor-pointer" style={{ fill: route.color, color: 'white' }} />
@@ -165,7 +165,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                     >
                         <div className="p-1">
                             <h3 className="font-semibold">{selectedStop.name}</h3>
-                            <p className="text-xs text-muted-foreground">{selectedStop.route.name}</p>
+                            <p className="text-xs text-muted-foreground">Stop {selectedStop.stopNumber} on {selectedStop.route.name}</p>
                         </div>
                     </InfoWindow>
                 )}
