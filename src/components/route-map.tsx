@@ -96,6 +96,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
             <Map 
                 defaultCenter={center} 
                 defaultZoom={12} 
+                mapId="b24b3a4a3e32e8b9"
                 styles={mapStyles}
                 disableDefaultUI={true}
                 gestureHandling={'greedy'}
