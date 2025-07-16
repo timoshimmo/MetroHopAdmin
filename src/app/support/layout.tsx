@@ -41,11 +41,7 @@ export default function SupportLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-
-  let pageTitle = "Support";
-  if (pathname === '/support/new') {
-    pageTitle = "New Support Case";
-  }
+  const pageTitle = "Support";
   
   return (
     <div className="min-h-screen w-full bg-muted/40">

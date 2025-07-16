@@ -4,9 +4,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { Headset, PlusCircle } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const supportCases = [
   { id: "C-1024", customer: "Adebayo Adekunle", date: "2024-08-01", type: "Complaint", details: "Bus MT-3401 was 20 minutes late.", status: "Resolved", assignedTo: "Support Team A" },
@@ -17,6 +23,16 @@ const supportCases = [
 ];
 
 export default function SupportPage() {
+  const router = useRouter();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real application, you would handle form submission here.
+    // For this demo, we'll just close the dialog by reloading (a better implementation would use state).
+    router.refresh();
+  };
+
+
   return (
     <div className="grid gap-6">
       <Card>
@@ -27,12 +43,68 @@ export default function SupportPage() {
                     Track and manage customer complaints and feedback.
                 </CardDescription>
             </div>
-            <Button asChild>
-                <Link href="/support/new">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button>
                     <PlusCircle className="mr-2" />
                     New Case
-                </Link>
-            </Button>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2"><Headset className="size-5"/>Create New Support Case</DialogTitle>
+                  <DialogDescription>
+                    Fill out the form below to log a new customer complaint or feedback.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-6 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="customerName">Customer Name</Label>
+                    <Input id="customerName" placeholder="Enter customer's full name" required />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="caseType">Case Type</Label>
+                    <Select required>
+                      <SelectTrigger id="caseType">
+                        <SelectValue placeholder="Select case type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Complaint">Complaint</SelectItem>
+                        <SelectItem value="Feedback">Feedback</SelectItem>
+                        <SelectItem value="Inquiry">Inquiry</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="details">Case Details</Label>
+                    <Textarea id="details" placeholder="Provide a detailed description of the case." rows={6} required />
+                  </div>
+
+                  <div className="space-y-2">
+                      <Label htmlFor="assignedTo">Assign To</Label>
+                      <Select required>
+                          <SelectTrigger id="assignedTo">
+                              <SelectValue placeholder="Assign to a team" />
+                          </SelectTrigger>
+                          <SelectContent>
+                              <SelectItem value="Support Team A">Support Team A</SelectItem>
+                              <SelectItem value="Support Team B">Support Team B</SelectItem>
+                              <SelectItem value="Maintenance">Maintenance</SelectItem>
+                              <SelectItem value="N/A">N/A</SelectItem>
+                          </SelectContent>
+                      </Select>
+                  </div>
+
+                  <DialogFooter>
+                      <Button type="submit">
+                          Create Case
+                      </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
         </CardHeader>
         <CardContent>
             <Table>
