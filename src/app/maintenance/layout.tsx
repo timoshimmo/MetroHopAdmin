@@ -77,16 +77,10 @@ export default function MaintenanceLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton href="/routes">
                   <Route />
                   Routes
-                  <ChevronDown className="ml-auto size-4 transition-transform group-data-[state=open]:rotate-180" />
                 </SidebarMenuButton>
-                <SidebarMenuSub>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="#">All Routes</SidebarMenuSubButton></SidebarMenuSubItem>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="#">Live Map</SidebarMenuSubButton></SidebarMenuSubItem>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="#">Add New Route</SidebarMenuSubButton></SidebarMenuSubItem>
-                </SidebarMenuSub>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton href="#">
