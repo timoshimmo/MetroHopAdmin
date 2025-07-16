@@ -1,57 +1,147 @@
 
 'use client'
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Fuel, Users, Wrench, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Fuel, Users, Wrench } from "lucide-react";
 
-const managementCards = [
-    { 
-        href: "/buses/maintenance", 
-        title: "Vehicle Maintenance", 
-        description: "Record and track maintenance activities for each vehicle.",
-        icon: Wrench 
-    },
-    { 
-        href: "/buses/operations", 
-        title: "Daily Operations", 
-        description: "View available buses and driver assignments for the day.",
-        icon: Users 
-    },
-    { 
-        href: "/buses/fuel", 
-        title: "Fuel Monitoring", 
-        description: "Analyze fuel consumption records based on distance.",
-        icon: Fuel 
-    },
-]
+const maintenanceHistory = [
+  { id: "M-98712", busId: "MT-3401", date: "2024-07-15", task: "Oil Change", cost: 150, status: "Completed" },
+  { id: "M-98713", busId: "MT-2198", date: "2024-07-20", task: "Brake Pad Replacement", cost: 450, status: "Completed" },
+  { id: "M-98714", busId: "MT-5527", date: "2024-07-29", task: "Engine Diagnostics", cost: 200, status: "In Progress" },
+  { id: "M-98715", busId: "MT-4815", date: "2024-08-01", task: "Tire Rotation", cost: 80, status: "Scheduled" },
+  { id: "M-98716", busId: "MT-6002", date: "2024-08-05", task: "Annual Inspection", cost: 300, status: "Scheduled" },
+];
+
+const dailyOperations = [
+  { busId: "MT-3401", driver: "Adekunle Adebayo", status: "On Route", assignment: "Lekki-Ajah Express" },
+  { busId: "MT-2198", driver: "Aisha Bello", status: "On Route", assignment: "Ikate-Sangotedo Loop" },
+  { busId: "MT-4815", driver: "Fatima Sani", status: "On Route", assignment: "Admiralty Commuter" },
+  { busId: "MT-6002", driver: "Yusuf Ibrahim", status: "Available", assignment: "N/A" },
+  { busId: "MT-1088", driver: "Chidi Nwosu", status: "Available", assignment: "N/A" },
+  { busId: "MT-5527", driver: "Emeka Okafor", status: "Maintenance", assignment: "N/A" },
+];
+
+const fuelData = [
+  { busId: "MT-3401", date: "2024-07-29", kmDriven: 152.3, fuelAdded: 30.5, mpg: 4.99 },
+  { busId: "MT-2198", date: "2024-07-29", kmDriven: 89.1, fuelAdded: 18.2, mpg: 4.89 },
+  { busId: "MT-4815", date: "2024-07-29", kmDriven: 210.5, fuelAdded: 42.0, mpg: 5.01 },
+  { busId: "MT-6002", date: "2024-07-28", kmDriven: 175.0, fuelAdded: 35.5, mpg: 4.93 },
+  { busId: "MT-5527", date: "2024-07-28", kmDriven: 0, fuelAdded: 0, mpg: 0 },
+];
 
 export default function BusesPage() {
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {managementCards.map((card) => (
-            <Link href={card.href} key={card.title}>
-                <Card className="hover:bg-muted/50 transition-colors h-full flex flex-col">
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className="p-3 rounded-md bg-primary/10 text-primary">
-                                <card.icon className="size-6" />
-                            </div>
-                            <div>
-                                <CardTitle>{card.title}</CardTitle>
-                                <CardDescription className="mt-1">{card.description}</CardDescription>
-                            </div>
-                        </div>
-                       
-                    </CardHeader>
-                    <CardContent className="mt-auto flex justify-end">
-                         <div className="flex items-center text-sm text-muted-foreground">
-                            View Details <ChevronRight className="size-4 ml-1" />
-                        </div>
-                    </CardContent>
-                </Card>
-            </Link>
-        ))}
+    <div className="grid gap-6">
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle className="flex items-center gap-2"><Wrench className="size-5 text-primary"/>Maintenance Records</CardTitle>
+                    <CardDescription>
+                        Track and manage all vehicle maintenance activities.
+                    </CardDescription>
+                </div>
+                <Button>Add New Record</Button>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Record ID</TableHead>
+                            <TableHead>Bus ID</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>Task</TableHead>
+                            <TableHead>Cost ($)</TableHead>
+                            <TableHead>Status</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {maintenanceHistory.map((record) => (
+                            <TableRow key={record.id}>
+                                <TableCell>{record.id}</TableCell>
+                                <TableCell>{record.busId}</TableCell>
+                                <TableCell>{record.date}</TableCell>
+                                <TableCell>{record.task}</TableCell>
+                                <TableCell>{record.cost.toFixed(2)}</TableCell>
+                                <TableCell>
+                                    <Badge variant={record.status === 'Completed' ? 'default' : record.status === 'In Progress' ? 'secondary' : 'outline'}>
+                                        {record.status}
+                                    </Badge>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Users className="size-5 text-primary"/>Drivers & Buses on Site</CardTitle>
+                <CardDescription>
+                    Overview of available buses and assigned drivers for today's operations.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Bus ID</TableHead>
+                            <TableHead>Assigned Driver</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Current Assignment</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {dailyOperations.map((op) => (
+                            <TableRow key={op.busId}>
+                                <TableCell>{op.busId}</TableCell>
+                                <TableCell>{op.driver}</TableCell>
+                                <TableCell>
+                                    <Badge variant={op.status === 'On Route' ? 'default' : op.status === 'Available' ? 'secondary' : 'destructive'}  className={op.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>
+                                        {op.status}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>{op.assignment}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+         <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Fuel className="size-5 text-primary"/>Fuel Consumption Records</CardTitle>
+                <CardDescription>
+                    Review fuel consumption records for each bus based on kilometers driven.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Bus ID</TableHead>
+                            <TableHead>Date</TableHead>
+                            <TableHead>KM Driven</TableHead>
+                            <TableHead>Fuel Added (Liters)</TableHead>
+                            <TableHead>KM per Liter</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {fuelData.map((record) => (
+                            <TableRow key={record.busId + record.date}>
+                                <TableCell>{record.busId}</TableCell>
+                                <TableCell>{record.date}</TableCell>
+                                <TableCell>{record.kmDriven.toFixed(1)}</TableCell>
+                                <TableCell>{record.fuelAdded.toFixed(1)}</TableCell>
+                                <TableCell>{record.mpg.toFixed(2)}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
     </div>
   );
 }

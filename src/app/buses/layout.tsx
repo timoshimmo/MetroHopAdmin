@@ -45,10 +45,7 @@ export default function BusesLayout({
 }) {
   const pathname = usePathname();
 
-  let pageTitle = "Bus Management";
-  if (pathname === '/buses/maintenance') pageTitle = "Vehicle Maintenance";
-  if (pathname === '/buses/operations') pageTitle = "Daily Operations";
-  if (pathname === '/buses/fuel') pageTitle = "Fuel Monitoring";
+  let pageTitle = "Buses";
   
   return (
     <div className="min-h-screen w-full bg-muted/40">
