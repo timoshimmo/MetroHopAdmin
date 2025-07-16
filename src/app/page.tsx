@@ -1,4 +1,5 @@
 
+
 'use client'
 
 import {
@@ -61,6 +62,8 @@ import {
   Bus,
   CalendarClock,
   ChevronDown,
+  Droplets,
+  Fuel,
   HandPlatter,
   Headset,
   LayoutDashboard,
@@ -187,10 +190,22 @@ export default function DashboardPage() {
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#" isActive>
+                <SidebarMenuButton href="/" isActive>
                   <LayoutDashboard />
                   <span>Dashboard</span>
                 </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                <SidebarMenuButton>
+                  <Bus />
+                  Buses
+                  <ChevronDown className="ml-auto size-4 transition-transform group-data-[state=open]:rotate-180" />
+                </SidebarMenuButton>
+                <SidebarMenuSub>
+                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/maintenance">Vehicle Maintenance</SidebarMenuSubButton></SidebarMenuSubItem>
+                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/operations">Daily Operations</SidebarMenuSubButton></SidebarMenuSubItem>
+                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/fuel">Fuel Monitoring</SidebarMenuSubButton></SidebarMenuSubItem>
+                </SidebarMenuSub>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton>
