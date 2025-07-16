@@ -7,8 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Briefcase, Bus, CircleDot, PlusCircle, Wrench, Zap } from "lucide-react";
 import { differenceInDays, parseISO } from 'date-fns';
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-const busDetails = [
+const initialBusDetails = [
   { busId: "MT-3401", name: "Lekki Express", color: "Red-Orange", plateNumber: "LND-101AB" },
   { busId: "MT-2198", name: "Ikate Loop", color: "Light Blue", plateNumber: "KJA-202BC" },
   { busId: "MT-4815", name: "Admiralty Rider", color: "Purple", plateNumber: "FST-303CD" },
@@ -51,6 +55,9 @@ const vehicleRentals = [
 
 
 export default function BusesPage() {
+  const [busDetails, setBusDetails] = useState(initialBusDetails);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newBus, setNewBus] = useState({ name: "", color: "", plateNumber: "" });
 
   const totalBuses = busDetails.length;
   const operationalBuses = dailyOperations.filter(op => op.status === 'On Route').length;
@@ -63,6 +70,26 @@ export default function BusesPage() {
     { title: "Under Maintenance", value: maintenanceBuses, icon: Wrench },
     { title: "Idle", value: idleBuses, icon: Zap },
   ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setNewBus(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleAddBus = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newBus.name && newBus.color && newBus.plateNumber) {
+      const newEntry = {
+        busId: `MT-${Math.floor(Math.random() * 9000) + 1000}`,
+        name: newBus.name,
+        color: newBus.color,
+        plateNumber: newBus.plateNumber,
+      };
+      setBusDetails(prev => [newEntry, ...prev]);
+      setNewBus({ name: "", color: "", plateNumber: "" });
+      setIsDialogOpen(false);
+    }
+  };
 
   return (
     <div className="grid gap-6">
@@ -88,10 +115,41 @@ export default function BusesPage() {
                       Complete list of all buses in the fleet.
                   </CardDescription>
               </div>
-              <Button>
-                  <PlusCircle className="mr-2" />
-                  Add New Bus
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                      <PlusCircle className="mr-2" />
+                      Add New Bus
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Add New Bus</DialogTitle>
+                    <DialogDescription>
+                      Enter the details for the new bus to add it to the fleet.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={handleAddBus}>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="name" className="text-right">Bus Name</Label>
+                        <Input id="name" placeholder="e.g. Lekki Shuttle" className="col-span-3" value={newBus.name} onChange={handleInputChange} required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="color" className="text-right">Color</Label>
+                        <Input id="color" placeholder="e.g. Blue" className="col-span-3" value={newBus.color} onChange={handleInputChange} required />
+                      </div>
+                      <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="plateNumber" className="text-right">Plate Number</Label>
+                        <Input id="plateNumber" placeholder="e.g. ABC-123XY" className="col-span-3" value={newBus.plateNumber} onChange={handleInputChange} required />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button type="submit">Add Bus</Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
           </CardHeader>
           <CardContent>
               <Table>
