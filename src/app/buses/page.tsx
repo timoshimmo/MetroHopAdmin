@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Briefcase, Bus, CircleDot, PlusCircle, Wrench, Zap } from "lucide-react";
+import { differenceInDays, parseISO } from 'date-fns';
 
 const busDetails = [
   { busId: "MT-3401", name: "Lekki Express", color: "Red-Orange", plateNumber: "LND-101AB" },
@@ -34,10 +35,13 @@ const vehicleStatus = [
 ];
 
 const vehicleRentals = [
-    { driver: "Kenji Tanaka", company: "Swift Logistics", duration: "3 Months", cost: "₦1,200,000", startDate: "2024-07-01", endDate: "2024-09-30" },
-    { driver: "Fatima Al-Jamil", company: "Metro Drivers Inc.", duration: "6 Months", cost: "₦2,500,000", startDate: "2024-06-15", endDate: "2024-12-14" },
-    { driver: "Alex Johnson", company: "City Tours Co.", duration: "1 Month", cost: "₦450,000", startDate: "2024-08-01", endDate: "2024-08-31" },
-];
+    { driver: "Kenji Tanaka", company: "Swift Logistics", cost: "₦1,200,000", startDate: "2024-07-01", endDate: "2024-09-30" },
+    { driver: "Fatima Al-Jamil", company: "Metro Drivers Inc.", cost: "₦2,500,000", startDate: "2024-06-15", endDate: "2024-12-14" },
+    { driver: "Alex Johnson", company: "City Tours Co.", cost: "₦450,000", startDate: "2024-08-01", endDate: "2024-08-31" },
+].map(rental => ({
+    ...rental,
+    duration: differenceInDays(parseISO(rental.endDate), parseISO(rental.startDate)),
+}));
 
 
 export default function BusesPage() {
@@ -194,7 +198,7 @@ export default function BusesPage() {
                     <TableRow>
                         <TableHead>Outsourced Driver</TableHead>
                         <TableHead>Hiring Company</TableHead>
-                        <TableHead>Duration</TableHead>
+                        <TableHead>Duration (days)</TableHead>
                         <TableHead>Cost</TableHead>
                         <TableHead>Start Date</TableHead>
                         <TableHead>End Date</TableHead>
