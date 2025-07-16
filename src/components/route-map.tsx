@@ -66,56 +66,69 @@ const mapStyles = [
 
 const DirectionsRenderer = ({ routes, onPathsLoaded }: { routes: Route[], onPathsLoaded: (paths: { [key: string]: LatLng[] }) => void }) => {
     const map = useMap();
+    const [directionsRenderers, setDirectionsRenderers] = useState<(google.maps.DirectionsRenderer | null)[]>([]);
     
     useEffect(() => {
         if (!map || !routes.length) return;
 
         const directionsService = new google.maps.DirectionsService();
+        const newRenderers: (google.maps.DirectionsRenderer | null)[] = [];
         const loadedPaths: { [key: string]: LatLng[] } = {};
-        let renderers: (google.maps.DirectionsRenderer | null)[] = [];
 
-        routes.forEach(route => {
-            if (route.path.length < 2) return;
-            
-            const directionsRenderer = new google.maps.DirectionsRenderer({
-                map,
-                suppressMarkers: true, 
-                polylineOptions: {
-                    strokeColor: route.color,
-                    strokeOpacity: 0.8,
-                    strokeWeight: 5,
+        const fetchRoute = (route: Route) => {
+            return new Promise<void>((resolve, reject) => {
+                if (route.path.length < 2) {
+                    resolve();
+                    return;
                 }
-            });
-            renderers.push(directionsRenderer);
-
-            const origin = route.path[0];
-            const destination = route.path[route.path.length - 1];
-            const waypoints = route.path.slice(1, -1).map(point => ({
-                location: point,
-                stopover: true,
-            }));
-
-            directionsService.route({
-                origin,
-                destination,
-                waypoints,
-                travelMode: google.maps.TravelMode.DRIVING,
-            }, (result, status) => {
-                if (status === google.maps.DirectionsStatus.OK && result) {
-                    directionsRenderer.setDirections(result);
-                    const path = result.routes[0].overview_path.map(p => ({ lat: p.lat(), lng: p.lng() }));
-                    loadedPaths[route.name] = path;
-                    if (Object.keys(loadedPaths).length === routes.length) {
-                        onPathsLoaded(loadedPaths);
+                
+                const directionsRenderer = new google.maps.DirectionsRenderer({
+                    map,
+                    suppressMarkers: true, 
+                    polylineOptions: {
+                        strokeColor: route.color,
+                        strokeOpacity: 0.8,
+                        strokeWeight: 5,
                     }
-                } else {
-                    console.error(`Directions request failed due to ${status} for route ${route.name}`);
-                }
+                });
+                newRenderers.push(directionsRenderer);
+
+                const origin = route.path[0];
+                const destination = route.path[route.path.length - 1];
+                const waypoints = route.path.slice(1, -1).map(point => ({
+                    location: point,
+                    stopover: true,
+                }));
+
+                directionsService.route({
+                    origin,
+                    destination,
+                    waypoints,
+                    travelMode: google.maps.TravelMode.DRIVING,
+                }, (result, status) => {
+                    if (status === google.maps.DirectionsStatus.OK && result) {
+                        directionsRenderer.setDirections(result);
+                        const path = result.routes[0].overview_path.map(p => ({ lat: p.lat(), lng: p.lng() }));
+                        loadedPaths[route.name] = path;
+                        resolve();
+                    } else {
+                        console.error(`Directions request failed due to ${status} for route ${route.name}`);
+                        reject(new Error(status));
+                    }
+                });
             });
-        });
+        };
+
+        Promise.all(routes.map(fetchRoute)).then(() => {
+            onPathsLoaded(loadedPaths);
+            setDirectionsRenderers(prevRenderers => {
+                prevRenderers.forEach(r => r?.setMap(null));
+                return newRenderers;
+            });
+        }).catch(error => console.error("Error fetching all routes:", error));
         
         return () => {
-             renderers.forEach(renderer => renderer?.setMap(null));
+             directionsRenderers.forEach(renderer => renderer?.setMap(null));
         }
 
     }, [map, routes, onPathsLoaded]);
@@ -147,9 +160,9 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
     const [detailedPaths, setDetailedPaths] = useState<{[key: string]: LatLng[]}>({});
     const animationRef = useRef<number>();
 
-    const handlePathsLoaded = (paths: { [key: string]: LatLng[] }) => {
+    const handlePathsLoaded = React.useCallback((paths: { [key: string]: LatLng[] }) => {
         setDetailedPaths(paths);
-    };
+    }, []);
 
     useEffect(() => {
         if (Object.keys(detailedPaths).length === 0) return;
@@ -170,7 +183,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
         }).filter(Boolean);
         
         const animate = () => {
-            const speedFactor = 0.000001; // Adjusted speed factor for realism
+            const speedFactor = 0.000002; // Adjusted speed factor for realism
             const newPositions : {[key: string]: LatLng} = {};
 
             routeData.forEach(data => {
@@ -217,8 +230,6 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
     }
 
     const center = { lat: 6.4428, lng: 3.5352 }; // Centered around Lekki
-
-    const activeRoutes = allRoutes.filter(route => route.status === 'Active');
 
     return (
         <APIProvider apiKey={apiKey}>
