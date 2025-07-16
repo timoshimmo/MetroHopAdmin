@@ -1,3 +1,4 @@
+
 'use client'
 
 import {
@@ -73,6 +74,7 @@ import {
 import Link from "next/link"
 import { SummarizeForm } from "@/components/summarize-form"
 import React from "react"
+import { RouteMap } from "@/components/route-map"
 
 const kpis = [
   { title: "Active Buses", value: "42", icon: Bus, change: "+5.2%" },
@@ -109,6 +111,14 @@ const outsourcedDrivers = [
 const routes = {
   "7B": {
     name: "Lekki-Ajah Express",
+    color: "#FF5733", // Red-Orange
+    path: [
+      { lat: 6.4474, lng: 3.4723 }, // Lekki Phase 1
+      { lat: 6.4326, lng: 3.5028 }, // Chevron
+      { lat: 6.4293, lng: 3.5499 }, // VGC
+      { lat: 6.4428, lng: 3.5824 }, // Abraham Adesanya
+      { lat: 6.4599, lng: 3.5931 }, // Ajah Bustop
+    ],
     stops: [
       { stop: 1, name: "Lekki Phase 1", time: "10:05 AM", status: "completed" },
       { stop: 2, name: "Chevron", time: "10:12 AM", status: "completed" },
@@ -119,6 +129,14 @@ const routes = {
   },
   "12A": {
     name: "Ikate-Sangotedo Loop",
+    color: "#33C4FF", // Light Blue
+    path: [
+      { lat: 6.4333, lng: 3.4833 }, // Ikate
+      { lat: 6.4340, lng: 3.5132 }, // Jakande
+      { lat: 6.4299, lng: 3.5352 }, // Igbo Efon
+      { lat: 6.4674, lng: 3.5816 }, // LBS
+      { lat: 6.4950, lng: 3.5700 }, // Sangotedo Market
+    ],
     stops: [
       { stop: 1, name: "Ikate", time: "11:00 AM", status: "completed" },
       { stop: 2, name: "Jakande", time: "11:10 AM", status: "current" },
@@ -129,6 +147,14 @@ const routes = {
   },
   "5C": {
     name: "Admiralty Commuter",
+    color: "#8E44AD", // Purple
+    path: [
+      { lat: 6.4450, lng: 3.4699 }, // Admiralty Way
+      { lat: 6.4528, lng: 3.4400 }, // Lekki-Ikoyi Link Bridge
+      { lat: 6.4495, lng: 3.4247 }, // Maroko
+      { lat: 6.4297, lng: 3.4675 }, // Lekki Arts & Crafts Market
+      { lat: 6.4172, lng: 3.4688 }, // Elegushi Beach
+    ],
     stops: [
       { stop: 1, name: "Admiralty Way", time: "09:30 AM", status: "completed" },
       { stop: 2, name: "Lekki-Ikoyi Link Bridge", time: "09:45 AM", status: "completed" },
@@ -255,16 +281,8 @@ export default function DashboardPage() {
                       <Map className="size-5 text-primary" />
                       <CardTitle>Pickup Locations Overview</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                       <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63428.16395368383!2d3.479504543328243!3d6.444903337968439!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bf5f71c4c5c21%3A0x50fde9f758779956!2sLekki%2C%20Lagos!5e0!3m2!1sen!2sng!4v1717283256000!5m2!1sen!2sng"
-                        width="100%"
-                        height="450"
-                        className="rounded-lg border"
-                        allowFullScreen={true}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                      ></iframe>
+                    <CardContent className="h-[450px] p-0">
+                      <RouteMap allRoutes={Object.values(routes)} />
                     </CardContent>
                   </Card>
 
@@ -412,5 +430,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    
