@@ -38,14 +38,14 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-export default function BusesLayout({
+export default function MaintenanceLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
-  let pageTitle = "Buses";
+  let pageTitle = "Maintenance";
   
   return (
     <div className="min-h-screen w-full bg-muted/40">
@@ -71,7 +71,7 @@ export default function BusesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/buses" isActive={pathname.startsWith('/buses')}>
+                <SidebarMenuButton href="/buses">
                   <Bus />
                   <span>Buses</span>
                 </SidebarMenuButton>
@@ -95,7 +95,7 @@ export default function BusesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton href="/maintenance">
+                <SidebarMenuButton href="/maintenance" isActive={pathname.startsWith('/maintenance')}>
                   <Wrench />
                   Maintenance
                 </SidebarMenuButton>
