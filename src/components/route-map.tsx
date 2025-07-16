@@ -1,7 +1,8 @@
 
 'use client';
 
-import { APIProvider, Map, AdvancedMarker, Polyline } from '@vis.gl/react-google-maps';
+import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
+import React, { useEffect } from 'react';
 
 type LatLng = { lat: number; lng: number };
 
@@ -52,6 +53,32 @@ const mapStyles = [
       }
 ];
 
+const Polylines = ({ routes }: { routes: Route[] }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!map || !routes.length) return;
+
+    const polylines = routes.map(route => {
+      const p = new google.maps.Polyline({
+        path: route.path,
+        strokeColor: route.color,
+        strokeOpacity: 0.8,
+        strokeWeight: 5,
+      });
+      p.setMap(map);
+      return p;
+    });
+    
+    return () => {
+      polylines.forEach(p => p.setMap(null));
+    };
+  }, [map, routes]);
+
+  return null;
+};
+
+
 export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
@@ -74,15 +101,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 disableDefaultUI={true}
                 gestureHandling={'greedy'}
             >
-                {allRoutes.map((route) => (
-                    <Polyline 
-                        key={route.name} 
-                        path={route.path} 
-                        strokeColor={route.color}
-                        strokeOpacity={0.8}
-                        strokeWeight={5}
-                    />
-                ))}
+                <Polylines routes={allRoutes} />
                  {allRoutes.flatMap(route => route.path.map((pos, index) => (
                     <AdvancedMarker key={`${route.name}-${index}`} position={pos}>
                         <div style={{
@@ -99,4 +118,3 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
         </APIProvider>
     );
 }
-
