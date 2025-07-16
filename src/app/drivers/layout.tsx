@@ -21,13 +21,9 @@ import {
   SidebarMenuButton,
   SidebarProvider,
   SidebarTrigger,
-  SidebarMenuSub,
-  SidebarMenuSubItem,
-  SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import {
   Bus,
-  ChevronDown,
   Headset,
   LayoutDashboard,
   LogOut,
@@ -38,14 +34,14 @@ import {
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-export default function BusesLayout({
+export default function DriversLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
 
-  let pageTitle = "Buses";
+  const pageTitle = "Drivers";
   
   return (
     <div className="min-h-screen w-full bg-muted/40">
@@ -71,7 +67,7 @@ export default function BusesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/buses" isActive={pathname.startsWith('/buses')}>
+                <SidebarMenuButton href="/buses">
                   <Bus />
                   <span>Buses</span>
                 </SidebarMenuButton>
@@ -83,7 +79,7 @@ export default function BusesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/drivers">
+                <SidebarMenuButton href="/drivers" isActive={pathname.startsWith('/drivers')}>
                   <Users />
                   Drivers
                 </SidebarMenuButton>

@@ -183,7 +183,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
         }).filter(Boolean);
         
         const animate = () => {
-            const speedFactor = 0.000002; // Adjusted speed factor for realism
+            const speedFactor = 0.0000002; // Adjusted speed factor for realism
             const newPositions : {[key: string]: LatLng} = {};
 
             routeData.forEach(data => {

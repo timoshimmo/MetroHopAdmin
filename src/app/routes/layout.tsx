@@ -83,7 +83,7 @@ export default function RoutesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
+                <SidebarMenuButton href="/drivers">
                   <Users />
                   Drivers
                 </SidebarMenuButton>

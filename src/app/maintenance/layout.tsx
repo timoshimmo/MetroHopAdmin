@@ -83,7 +83,7 @@ export default function MaintenanceLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="#">
+                <SidebarMenuButton href="/drivers">
                   <Users />
                   Drivers
                 </SidebarMenuButton>
