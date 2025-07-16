@@ -96,7 +96,6 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
             <Map 
                 defaultCenter={center} 
                 defaultZoom={12} 
-                mapId="metro-track-map"
                 styles={mapStyles}
                 disableDefaultUI={true}
                 gestureHandling={'greedy'}
