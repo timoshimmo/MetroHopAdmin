@@ -64,19 +64,17 @@ const mapStyles = [
       }
 ];
 
-const Directions = ({ routes }: { routes: Route[] }) => {
+const DirectionsRenderer = ({ routes, onPathsLoaded }: { routes: Route[], onPathsLoaded: (paths: { [key: string]: LatLng[] }) => void }) => {
     const map = useMap();
-    const directionsRenderers = useRef<google.maps.DirectionsRenderer[]>([]);
-
+    
     useEffect(() => {
         if (!map || !routes.length) return;
 
-        // Clear existing renderers
-        directionsRenderers.current.forEach(renderer => renderer.setMap(null));
-        directionsRenderers.current = [];
-        
-        routes.forEach(route => {
-            if (route.path.length < 2) return;
+        const directionsService = new google.maps.DirectionsService();
+        const loadedPaths: { [key: string]: LatLng[] } = {};
+
+        const renderers = routes.map(route => {
+            if (route.path.length < 2) return null;
             
             const directionsRenderer = new google.maps.DirectionsRenderer({
                 map,
@@ -87,7 +85,6 @@ const Directions = ({ routes }: { routes: Route[] }) => {
                     strokeWeight: 5,
                 }
             });
-            directionsRenderers.current.push(directionsRenderer);
 
             const origin = route.path[0];
             const destination = route.path[route.path.length - 1];
@@ -96,27 +93,31 @@ const Directions = ({ routes }: { routes: Route[] }) => {
                 stopover: true,
             }));
 
-            const directionsService = new google.maps.DirectionsService();
-
             directionsService.route({
                 origin,
                 destination,
                 waypoints,
                 travelMode: google.maps.TravelMode.DRIVING,
             }, (result, status) => {
-                if (status === google.maps.DirectionsStatus.OK) {
+                if (status === google.maps.DirectionsStatus.OK && result) {
                     directionsRenderer.setDirections(result);
+                    const path = result.routes[0].overview_path.map(p => ({ lat: p.lat(), lng: p.lng() }));
+                    loadedPaths[route.name] = path;
+                    if (Object.keys(loadedPaths).length === routes.length) {
+                        onPathsLoaded(loadedPaths);
+                    }
                 } else {
                     console.error(`Directions request failed due to ${status} for route ${route.name}`);
                 }
             });
+            return directionsRenderer;
         });
         
         return () => {
-             directionsRenderers.current.forEach(renderer => renderer.setMap(null));
+             renderers.forEach(renderer => renderer?.setMap(null));
         }
 
-    }, [map, routes]);
+    }, [map, routes, onPathsLoaded]);
 
     return null;
 };
@@ -142,41 +143,50 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string, stopNumber: number} | null>(null);
     const [busPositions, setBusPositions] = useState<{[key: string]: LatLng}>({});
+    const [detailedPaths, setDetailedPaths] = useState<{[key: string]: LatLng[]}>({});
     const animationRef = useRef<number>();
 
+    const handlePathsLoaded = (paths: { [key: string]: LatLng[] }) => {
+        setDetailedPaths(paths);
+    };
+
     useEffect(() => {
+        if (Object.keys(detailedPaths).length === 0) return;
+
         const routeData = allRoutes.map(route => {
-            if (route.status !== 'Active') return null;
-            const totalDistance = route.path.reduce((acc, curr, i, arr) => {
+            if (route.status !== 'Active' || !detailedPaths[route.name]) return null;
+            const path = detailedPaths[route.name];
+            const totalDistance = path.reduce((acc, curr, i, arr) => {
                 if (i === 0) return 0;
                 return acc + getDistance(arr[i-1], curr);
             }, 0);
             return {
                 route,
+                path,
                 totalDistance,
-                segmentDistances: route.path.map((p, i) => i === 0 ? 0 : getDistance(route.path[i-1], p)),
+                segmentDistances: path.map((p, i) => i === 0 ? 0 : getDistance(path[i-1], p)),
             };
         }).filter(Boolean);
         
         const animate = () => {
-            const speedFactor = 0.00000002; // Increased speed factor
+            const speedFactor = 0.0000002; // Adjusted speed factor for realism
             const newPositions : {[key: string]: LatLng} = {};
 
             routeData.forEach(data => {
                 if (!data) return;
-                const { route, totalDistance, segmentDistances } = data;
+                const { route, path, totalDistance, segmentDistances } = data;
                 const time = Date.now();
-                const progress = (time * speedFactor * totalDistance) % 1;
+                const progress = (time * speedFactor * (totalDistance / 1000)) % 1; // Normalize speed based on distance
                 const distanceCovered = progress * totalDistance;
 
                 let distanceSoFar = 0;
-                for (let i = 1; i < route.path.length; i++) {
+                for (let i = 1; i < path.length; i++) {
                     const segmentLength = segmentDistances[i];
                     if (distanceSoFar + segmentLength >= distanceCovered) {
                         const overflow = distanceCovered - distanceSoFar;
-                        const fraction = overflow / segmentLength;
-                        const p1 = route.path[i-1];
-                        const p2 = route.path[i];
+                        const fraction = segmentLength > 0 ? overflow / segmentLength : 0;
+                        const p1 = path[i-1];
+                        const p2 = path[i];
                         newPositions[route.name] = interpolateLatLng(p1, p2, fraction);
                         break;
                     }
@@ -195,7 +205,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 cancelAnimationFrame(animationRef.current);
             }
         };
-    }, [allRoutes]);
+    }, [allRoutes, detailedPaths]);
 
     if (!apiKey) {
         return (
@@ -206,6 +216,8 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
     }
 
     const center = { lat: 6.4428, lng: 3.5352 }; // Centered around Lekki
+
+    const activeRoutes = allRoutes.filter(route => route.status === 'Active');
 
     return (
         <APIProvider apiKey={apiKey}>
@@ -218,17 +230,10 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 gestureHandling={'greedy'}
                 onClick={() => setSelectedStop(null)}
             >
-                <Directions routes={allRoutes} />
+                <DirectionsRenderer routes={allRoutes} onPathsLoaded={handlePathsLoaded} />
                 
                 {allRoutes.flatMap(route => 
                     (route.stops || []).map((stop, index) => {
-                        // Find the corresponding point in the path, as stops might not map 1:1
-                        const stopNameLower = stop.name.toLowerCase();
-                        const pathIndex = route.path.findIndex(p => {
-                            // This is a simplistic match. A real app might have lat/lng on stops.
-                            return true; // Simplified for now
-                        });
-                        
                         const pos = route.path[index] || route.path[0];
                         
                         return (
