@@ -61,7 +61,6 @@ import {
   Users,
   Wrench,
 } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { SummarizeForm } from "@/components/summarize-form"
 
@@ -211,14 +210,15 @@ export default function DashboardPage() {
                       <CardTitle>Pickup Locations Overview</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <Image
-                        src="https://placehold.co/1200x600.png"
-                        alt="Map of pickup locations"
-                        width={1200}
-                        height={600}
+                       <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63428.16395368383!2d3.479504543328243!3d6.444903337968439!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103bf5f71c4c5c21%3A0x50fde9f758779956!2sLekki%2C%20Lagos!5e0!3m2!1sen!2sng!4v1717283256000!5m2!1sen!2sng"
+                        width="100%"
+                        height="450"
                         className="rounded-lg border"
-                        data-ai-hint="city map"
-                      />
+                        allowFullScreen={true}
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      ></iframe>
                     </CardContent>
                   </Card>
 
