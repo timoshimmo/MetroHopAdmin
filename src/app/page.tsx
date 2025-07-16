@@ -195,17 +195,11 @@ export default function DashboardPage() {
                   <span>Dashboard</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton>
+              <SidebarMenuItem>
+                <SidebarMenuButton href="/buses">
                   <Bus />
-                  Buses
-                  <ChevronDown className="ml-auto size-4 transition-transform group-data-[state=open]:rotate-180" />
+                  <span>Buses</span>
                 </SidebarMenuButton>
-                <SidebarMenuSub>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/maintenance">Vehicle Maintenance</SidebarMenuSubButton></SidebarMenuSubItem>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/operations">Daily Operations</SidebarMenuSubButton></SidebarMenuSubItem>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/fuel">Fuel Monitoring</SidebarMenuSubButton></SidebarMenuSubItem>
-                </SidebarMenuSub>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton>

@@ -71,16 +71,10 @@ export default function BusesLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton href="/buses" isActive={pathname.startsWith('/buses')}>
                   <Bus />
-                  Buses
-                  <ChevronDown className="ml-auto size-4 transition-transform group-data-[state=open]:rotate-180" />
+                  <span>Buses</span>
                 </SidebarMenuButton>
-                <SidebarMenuSub>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/maintenance" isActive={pathname === '/buses/maintenance'}>Vehicle Maintenance</SidebarMenuSubButton></SidebarMenuSubItem>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/operations" isActive={pathname === '/buses/operations'}>Daily Operations</SidebarMenuSubButton></SidebarMenuSubItem>
-                    <SidebarMenuSubItem><SidebarMenuSubButton href="/buses/fuel" isActive={pathname === '/buses/fuel'}>Fuel Monitoring</SidebarMenuSubButton></SidebarMenuSubItem>
-                </SidebarMenuSub>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton>
