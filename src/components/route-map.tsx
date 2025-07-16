@@ -72,9 +72,10 @@ const DirectionsRenderer = ({ routes, onPathsLoaded }: { routes: Route[], onPath
 
         const directionsService = new google.maps.DirectionsService();
         const loadedPaths: { [key: string]: LatLng[] } = {};
+        let renderers: (google.maps.DirectionsRenderer | null)[] = [];
 
-        const renderers = routes.map(route => {
-            if (route.path.length < 2) return null;
+        routes.forEach(route => {
+            if (route.path.length < 2) return;
             
             const directionsRenderer = new google.maps.DirectionsRenderer({
                 map,
@@ -85,6 +86,7 @@ const DirectionsRenderer = ({ routes, onPathsLoaded }: { routes: Route[], onPath
                     strokeWeight: 5,
                 }
             });
+            renderers.push(directionsRenderer);
 
             const origin = route.path[0];
             const destination = route.path[route.path.length - 1];
@@ -110,7 +112,6 @@ const DirectionsRenderer = ({ routes, onPathsLoaded }: { routes: Route[], onPath
                     console.error(`Directions request failed due to ${status} for route ${route.name}`);
                 }
             });
-            return directionsRenderer;
         });
         
         return () => {
@@ -169,7 +170,7 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
         }).filter(Boolean);
         
         const animate = () => {
-            const speedFactor = 0.0000002; // Adjusted speed factor for realism
+            const speedFactor = 0.000001; // Adjusted speed factor for realism
             const newPositions : {[key: string]: LatLng} = {};
 
             routeData.forEach(data => {
