@@ -8,11 +8,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Fuel, Wrench } from "lucide-react";
 
 const maintenanceHistory = [
-  { id: "M-98712", busId: "MT-3401", date: "2024-07-15", task: "Oil Change", cost: 150, status: "Completed" },
-  { id: "M-98713", busId: "MT-2198", date: "2024-07-20", task: "Brake Pad Replacement", cost: 450, status: "Completed" },
-  { id: "M-98714", busId: "MT-5527", date: "2024-07-29", task: "Engine Diagnostics", cost: 200, status: "In Progress" },
-  { id: "M-98715", busId: "MT-4815", date: "2024-08-01", task: "Tire Rotation", cost: 80, status: "Scheduled" },
-  { id: "M-98716", busId: "MT-6002", date: "2024-08-05", task: "Annual Inspection", cost: 300, status: "Scheduled" },
+  { id: "M-98712", busId: "MT-3401", date: "2024-07-15", task: "Oil Change", cost: 15000, status: "Completed" },
+  { id: "M-98713", busId: "MT-2198", date: "2024-07-20", task: "Brake Pad Replacement", cost: 45000, status: "Completed" },
+  { id: "M-98714", busId: "MT-5527", date: "2024-07-29", task: "Engine Diagnostics", cost: 20000, status: "In Progress" },
+  { id: "M-98715", busId: "MT-4815", date: "2024-08-01", task: "Tire Rotation", cost: 8000, status: "Scheduled" },
+  { id: "M-98716", busId: "MT-6002", date: "2024-08-05", task: "Annual Inspection", cost: 30000, status: "Scheduled" },
 ];
 
 const fuelData = [
@@ -44,7 +44,7 @@ export default function MaintenancePage() {
                             <TableHead>Bus ID</TableHead>
                             <TableHead>Date</TableHead>
                             <TableHead>Task</TableHead>
-                            <TableHead>Cost ($)</TableHead>
+                            <TableHead>Cost (₦)</TableHead>
                             <TableHead>Status</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -55,7 +55,7 @@ export default function MaintenancePage() {
                                 <TableCell>{record.busId}</TableCell>
                                 <TableCell>{record.date}</TableCell>
                                 <TableCell>{record.task}</TableCell>
-                                <TableCell>{record.cost.toFixed(2)}</TableCell>
+                                <TableCell>₦{record.cost.toLocaleString()}</TableCell>
                                 <TableCell>
                                     <Badge variant={record.status === 'Completed' ? 'default' : record.status === 'In Progress' ? 'secondary' : 'outline'}>
                                         {record.status}
