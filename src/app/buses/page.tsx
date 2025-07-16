@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Bus, CircleDot, PlusCircle, Wrench, Zap } from "lucide-react";
+import { Briefcase, Bus, CircleDot, PlusCircle, Wrench, Zap } from "lucide-react";
 
 const busDetails = [
   { busId: "MT-3401", name: "Lekki Express", color: "Red-Orange", plateNumber: "LND-101AB" },
@@ -31,6 +31,12 @@ const vehicleStatus = [
   { id: "MT-5527", driver: "Emeka Okafor", location: "Depot (Ajah)", status: "Maintenance", occupancy: "0%", seatCapacity: "45 Seater" },
   { id: "MT-4815", driver: "Fatima Sani", location: "VGC", status: "On Route", occupancy: "60%", seatCapacity: "60 Seater" },
   { id: "MT-6002", driver: "Yusuf Ibrahim", location: "Jakande", status: "Idle", occupancy: "0%", seatCapacity: "45 Seater" },
+];
+
+const vehicleRentals = [
+    { driver: "Kenji Tanaka", company: "Swift Logistics", duration: "3 Months", cost: "₦1,200,000", startDate: "2024-07-01", endDate: "2024-09-30" },
+    { driver: "Fatima Al-Jamil", company: "Metro Drivers Inc.", duration: "6 Months", cost: "₦2,500,000", startDate: "2024-06-15", endDate: "2024-12-14" },
+    { driver: "Alex Johnson", company: "City Tours Co.", duration: "1 Month", cost: "₦450,000", startDate: "2024-08-01", endDate: "2024-08-31" },
 ];
 
 
@@ -173,6 +179,41 @@ export default function BusesPage() {
               </TableBody>
               </Table>
           </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Briefcase className="size-5 text-primary"/>Vehicle Rentals</CardTitle>
+            <CardDescription>
+                Details of buses outsourced for rental services.
+            </CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Outsourced Driver</TableHead>
+                        <TableHead>Hiring Company</TableHead>
+                        <TableHead>Duration</TableHead>
+                        <TableHead>Cost</TableHead>
+                        <TableHead>Start Date</TableHead>
+                        <TableHead>End Date</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {vehicleRentals.map((rental, index) => (
+                        <TableRow key={index}>
+                            <TableCell>{rental.driver}</TableCell>
+                            <TableCell>{rental.company}</TableCell>
+                            <TableCell>{rental.duration}</TableCell>
+                            <TableCell>{rental.cost}</TableCell>
+                            <TableCell>{rental.startDate}</TableCell>
+                            <TableCell>{rental.endDate}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </CardContent>
       </Card>
     </div>
   );
