@@ -69,7 +69,7 @@ const kpis = [
   { title: "Drivers On-duty", value: "58", icon: Users, change: "+2" },
   { title: "Maintenance Queue", value: "3", icon: Wrench, change: "-1" },
   { title: "Completed Routes", value: "128", icon: Route, change: "+12" },
-]
+];
 
 const vehicleStatus = [
   { id: "MT-3401", driver: "Adekunle Adebayo", location: "Lekki Phase 1", status: "On Route", capacity: "85%" },
@@ -77,24 +77,24 @@ const vehicleStatus = [
   { id: "MT-5527", driver: "Emeka Okafor", location: "Depot (Ajah)", status: "Maintenance", capacity: "0%" },
   { id: "MT-4815", driver: "Fatima Sani", location: "VGC", status: "On Route", capacity: "60%" },
   { id: "MT-6002", driver: "Yusuf Ibrahim", location: "Jakande", status: "Idle", capacity: "0%" },
-]
+];
 
 const pickupRequests = [
     { name: "Chioma Okoro", from: "Ikate Elegushi", to: "Ajah Market", time: "10:15 AM" },
     { name: "Tunde Adeyemi", from: "Abraham Adesanya", to: "Lekki Toll Gate", time: "10:30 AM" },
     { name: "Bolanle Williams", from: "Sangotedo", to: "Admiralty Way", time: "10:45 AM" },
-]
+];
 
 const maintenanceSchedule = [
     { id: "MT-5527", task: "Engine Diagnostics", date: "Today", mechanic: "Bob" },
     { id: "MT-1088", task: "Brake Replacement", date: "Tomorrow", mechanic: "Alice" },
     { id: "MT-3401", task: "Tire Rotation", date: "2 days", mechanic: "Charlie" },
-]
+];
 
 const outsourcedDrivers = [
     { name: "Kenji Tanaka", company: "Swift Logistics", contractEnd: "2024-12-31" },
     { name: "Fatima Al-Jamil", company: "Metro Drivers Inc.", contractEnd: "2025-06-30" },
-]
+];
 
 export default function DashboardPage() {
   return (
