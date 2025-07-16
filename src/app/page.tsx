@@ -281,8 +281,23 @@ export default function DashboardPage() {
                       <Map className="size-5 text-primary" />
                       <CardTitle>Pickup Locations Overview</CardTitle>
                     </CardHeader>
-                    <CardContent className="h-[450px] p-0">
-                      <RouteMap allRoutes={Object.values(routes)} />
+                    <CardContent className="p-0">
+                      <div className="h-[400px]">
+                        <RouteMap allRoutes={Object.values(routes)} />
+                      </div>
+                      <div className="p-4 border-t">
+                          <div className="flex flex-wrap gap-x-6 gap-y-2">
+                              {Object.values(routes).map((route) => (
+                                  <div key={route.name} className="flex items-center gap-2">
+                                      <div
+                                          className="w-3 h-3 rounded-full"
+                                          style={{ backgroundColor: route.color }}
+                                      />
+                                      <span className="text-xs font-medium">{route.name}</span>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
                     </CardContent>
                   </Card>
 
