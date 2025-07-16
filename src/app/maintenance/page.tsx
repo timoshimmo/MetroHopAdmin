@@ -4,11 +4,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Fuel, Wrench } from "lucide-react";
+import { Fuel, PlusCircle, Wrench } from "lucide-react";
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FuelConsumptionChart } from "@/components/fuel-consumption-chart";
+import { Textarea } from "@/components/ui/textarea";
 
 const maintenanceHistory = [
   { id: "M-98712", busId: "MT-3401", date: "2024-07-15", task: "Oil Change", cost: 15000, status: "Completed" },
@@ -26,6 +30,8 @@ const fuelData = [
   { busId: "MT-5527", date: "2024-07-28", kmDriven: 0, fuelAdded: 0, mpg: 0 },
   { busId: "MT-1088", date: "2024-07-28", kmDriven: 120.0, fuelAdded: 25.0, mpg: 4.80 },
 ];
+
+const allBuses = Array.from(new Set(maintenanceHistory.map(b => b.busId).concat(fuelData.map(f => f.busId))));
 
 const fuelConsumptionData = {
   "7d": [
@@ -68,7 +74,65 @@ export default function MaintenancePage() {
                         Track and manage all vehicle maintenance activities.
                     </CardDescription>
                 </div>
-                <Button>Add New Record</Button>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button>
+                            <PlusCircle className="mr-2" />
+                            Add New Record
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Add New Maintenance Record</DialogTitle>
+                            <DialogDescription>
+                                Fill in the details below to add a new maintenance record.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="busId" className="text-right">Bus ID</Label>
+                                <Select>
+                                    <SelectTrigger id="busId" className="col-span-3">
+                                        <SelectValue placeholder="Select a bus" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {allBuses.map(busId => (
+                                            <SelectItem key={busId} value={busId}>{busId}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="date" className="text-right">Date</Label>
+                                <Input id="date" type="date" className="col-span-3" />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="task" className="text-right">Task</Label>
+                                <Input id="task" placeholder="e.g. Oil Change" className="col-span-3" />
+                            </div>
+                             <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="cost" className="text-right">Cost (₦)</Label>
+                                <Input id="cost" type="number" placeholder="e.g. 15000" className="col-span-3" />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="status" className="text-right">Status</Label>
+                                <Select>
+                                    <SelectTrigger id="status" className="col-span-3">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Scheduled">Scheduled</SelectItem>
+                                        <SelectItem value="In Progress">In Progress</SelectItem>
+                                        <SelectItem value="Completed">Completed</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit">Add Record</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </CardHeader>
             <CardContent>
                 <Table>
