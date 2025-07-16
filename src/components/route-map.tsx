@@ -3,6 +3,7 @@
 
 import { APIProvider, Map, AdvancedMarker, useMap, InfoWindow } from '@vis.gl/react-google-maps';
 import React, { useEffect, useState } from 'react';
+import { MapPin } from 'lucide-react';
 
 type LatLng = { lat: number; lng: number };
 
@@ -150,11 +151,8 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                                     setSelectedStop({route, stop: pos, name: stop.name});
                                 }}
                             >
-                                <div className="p-1 rounded-full bg-white shadow-lg cursor-pointer"
-                                    style={{ border: `2px solid ${route.color}` }}
-                                >
-                                    <div className="w-2 h-2 rounded-full" style={{backgroundColor: route.color}}></div>
-                                </div>
+                                <MapPin className="text-red-500 w-8 h-8 cursor-pointer" style={{ fill: route.color, color: 'white' }} />
+
                             </AdvancedMarker>
                         )
                     })
