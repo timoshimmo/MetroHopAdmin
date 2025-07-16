@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Fuel, Wrench } from "lucide-react";
+import React from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FuelConsumptionChart } from "@/components/fuel-consumption-chart";
 
 const maintenanceHistory = [
   { id: "M-98712", busId: "MT-3401", date: "2024-07-15", task: "Oil Change", cost: 15000, status: "Completed" },
@@ -21,9 +24,40 @@ const fuelData = [
   { busId: "MT-4815", date: "2024-07-29", kmDriven: 210.5, fuelAdded: 42.0, mpg: 5.01 },
   { busId: "MT-6002", date: "2024-07-28", kmDriven: 175.0, fuelAdded: 35.5, mpg: 4.93 },
   { busId: "MT-5527", date: "2024-07-28", kmDriven: 0, fuelAdded: 0, mpg: 0 },
+  { busId: "MT-1088", date: "2024-07-28", kmDriven: 120.0, fuelAdded: 25.0, mpg: 4.80 },
 ];
 
+const fuelConsumptionData = {
+  "7d": [
+    { busId: "MT-3401", kmPerLiter: 5.0 },
+    { busId: "MT-2198", kmPerLiter: 4.9 },
+    { busId: "MT-5527", kmPerLiter: 0 },
+    { busId: "MT-4815", kmPerLiter: 5.1 },
+    { busId: "MT-6002", kmPerLiter: 4.8 },
+    { busId: "MT-1088", kmPerLiter: 4.85 },
+  ],
+  "30d": [
+    { busId: "MT-3401", kmPerLiter: 4.95 },
+    { busId: "MT-2198", kmPerLiter: 4.85 },
+    { busId: "MT-5527", kmPerLiter: 0 },
+    { busId: "MT-4815", kmPerLiter: 5.05 },
+    { busId: "MT-6002", kmPerLiter: 4.75 },
+    { busId: "MT-1088", kmPerLiter: 4.82 },
+  ],
+  "90d": [
+    { busId: "MT-3401", kmPerLiter: 4.98 },
+    { busId: "MT-2198", kmPerLiter: 4.88 },
+    { busId: "MT-5527", kmPerLiter: 0 },
+    { busId: "MT-4815", kmPerLiter: 5.08 },
+    { busId: "MT-6002", kmPerLiter: 4.78 },
+    { busId: "MT-1088", kmPerLiter: 4.84 },
+  ],
+};
+
+
 export default function MaintenancePage() {
+  const [fuelDuration, setFuelDuration] = React.useState<keyof typeof fuelConsumptionData>("30d");
+
   return (
     <div className="grid gap-6">
         <Card>
@@ -57,7 +91,7 @@ export default function MaintenancePage() {
                                 <TableCell>{record.task}</TableCell>
                                 <TableCell>₦{record.cost.toLocaleString()}</TableCell>
                                 <TableCell>
-                                    <Badge variant={record.status === 'Completed' ? 'default' : record.status === 'In Progress' ? 'secondary' : 'outline'}>
+                                    <Badge variant={record.status === 'Completed' ? 'default' : record.status === 'In Progress' ? 'secondary' : 'outline'} className={record.status === 'Completed' ? 'bg-green-600/20 text-green-800' : ''}>
                                         {record.status}
                                     </Badge>
                                 </TableCell>
@@ -65,6 +99,27 @@ export default function MaintenancePage() {
                         ))}
                     </TableBody>
                 </Table>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                    <Fuel className="size-5 text-primary"/>
+                    <CardTitle>Fuel Consumption</CardTitle>
+                </div>
+                <Select value={fuelDuration} onValueChange={(value) => setFuelDuration(value as keyof typeof fuelConsumptionData)}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="7d">Last 7 days</SelectItem>
+                        <SelectItem value="30d">Last 30 days</SelectItem>
+                        <SelectItem value="90d">Last 90 days</SelectItem>
+                    </SelectContent>
+                </Select>
+            </CardHeader>
+            <CardContent>
+               <FuelConsumptionChart data={fuelConsumptionData[fuelDuration]} />
             </CardContent>
         </Card>
          <Card>
