@@ -62,6 +62,7 @@ import {
   Bus,
   CalendarClock,
   ChevronDown,
+  DollarSign,
   Droplets,
   Fuel,
   HandPlatter,
@@ -78,6 +79,7 @@ import Link from "next/link"
 import { SummarizeForm } from "@/components/summarize-form"
 import React from "react"
 import { RouteMap } from "@/components/route-map"
+import { RevenueChart } from "@/components/revenue-chart"
 
 const kpis = [
   { title: "Active Buses", value: "42", icon: Bus, change: "+5.2%" },
@@ -168,9 +170,38 @@ const routes = {
   },
 };
 
+const revenueData = {
+  "7d": [
+    { vehicleId: "MT-3401", revenue: 280000 },
+    { vehicleId: "MT-2198", revenue: 195000 },
+    { vehicleId: "MT-5527", revenue: 50000 },
+    { vehicleId: "MT-4815", revenue: 350000 },
+    { vehicleId: "MT-6002", revenue: 120000 },
+    { vehicleId: "MT-1088", revenue: 95000 },
+  ],
+  "30d": [
+    { vehicleId: "MT-3401", revenue: 1200000 },
+    { vehicleId: "MT-2198", revenue: 850000 },
+    { vehicleId: "MT-5527", revenue: 200000 },
+    { vehicleId: "MT-4815", revenue: 1500000 },
+    { vehicleId: "MT-6002", revenue: 550000 },
+    { vehicleId: "MT-1088", revenue: 420000 },
+  ],
+  "90d": [
+    { vehicleId: "MT-3401", revenue: 3500000 },
+    { vehicleId: "MT-2198", revenue: 2400000 },
+    { vehicleId: "MT-5527", revenue: 600000 },
+    { vehicleId: "MT-4815", revenue: 4200000 },
+    { vehicleId: "MT-6002", revenue: 1800000 },
+    { vehicleId: "MT-1088", revenue: 1200000 },
+  ],
+};
+
+
 export default function DashboardPage() {
   const [selectedRouteId, setSelectedRouteId] = React.useState<keyof typeof routes>("7B");
   const selectedRoute = routes[selectedRouteId];
+  const [revenueDuration, setRevenueDuration] = React.useState<keyof typeof revenueData>("30d");
   
   return (
     <div className="min-h-screen w-full bg-muted/40">
@@ -381,7 +412,30 @@ export default function DashboardPage() {
                       </Table>
                     </CardContent>
                   </Card>
-                   <Card>
+                  
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <DollarSign className="size-5 text-primary"/>
+                            <CardTitle>Vehicle Revenue</CardTitle>
+                        </div>
+                        <Select value={revenueDuration} onValueChange={(value) => setRevenueDuration(value as keyof typeof revenueData)}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Select duration" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="7d">Last 7 days</SelectItem>
+                                <SelectItem value="30d">Last 30 days</SelectItem>
+                                <SelectItem value="90d">Last 90 days</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </CardHeader>
+                    <CardContent>
+                       <RevenueChart data={revenueData[revenueDuration]} />
+                    </CardContent>
+                  </Card>
+                  
+                   {/* <Card>
                     <CardHeader className="flex flex-row items-center gap-2">
                         <HandPlatter className="size-5 text-primary"/>
                         <CardTitle>Pending Pickup Requests</CardTitle>
@@ -408,7 +462,7 @@ export default function DashboardPage() {
                           ))}
                         </Accordion>
                     </CardContent>
-                  </Card>
+                  </Card> */}
                 </div>
 
                 <SummarizeForm />
