@@ -62,7 +62,7 @@ export default function DriversLayout({
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/">
+                <SidebarMenuButton href="/dashboard">
                   <LayoutDashboard />
                   <span>Dashboard</span>
                 </SidebarMenuButton>
@@ -131,7 +131,7 @@ export default function DriversLayout({
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/login">
+                  <Link href="/">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                   </Link>

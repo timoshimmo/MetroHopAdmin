@@ -1,4 +1,3 @@
-
 'use client'
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -33,16 +32,12 @@ import {
   Wrench,
 } from "lucide-react"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
 
-export default function SupportLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const pageTitle = "Support";
-  
   return (
     <div className="min-h-screen w-full bg-muted/40">
       <SidebarProvider>
@@ -61,7 +56,7 @@ export default function SupportLayout({
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/dashboard">
+                <SidebarMenuButton href="/dashboard" isActive>
                   <LayoutDashboard />
                   <span>Dashboard</span>
                 </SidebarMenuButton>
@@ -84,14 +79,14 @@ export default function SupportLayout({
                   Drivers
                 </SidebarMenuButton>
               </SidebarMenuItem>
-               <SidebarMenuItem>
+              <SidebarMenuItem>
                 <SidebarMenuButton href="/maintenance">
                   <Wrench />
                   Maintenance
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton href="/support" isActive={pathname.startsWith('/support')}>
+                <SidebarMenuButton href="/support">
                   <Headset />
                   Support
                 </SidebarMenuButton>
@@ -104,7 +99,7 @@ export default function SupportLayout({
           <header className="flex h-14 items-center gap-4 border-b bg-background px-6">
             <SidebarTrigger className="lg:hidden" />
             <div className="flex-1">
-              <h1 className="text-lg font-semibold">{pageTitle}</h1>
+              <h1 className="text-lg font-semibold">Dashboard</h1>
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -138,7 +133,8 @@ export default function SupportLayout({
               </DropdownMenuContent>
             </DropdownMenu>
           </header>
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+
+          <main className="flex-1">
             {children}
           </main>
         </SidebarInset>
