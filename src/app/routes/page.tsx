@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ListOrdered, Map, PlusCircle, Route } from "lucide-react";
+import { DollarSign, ListOrdered, Map, PlusCircle, Route } from "lucide-react";
 import React from "react";
 import { RouteMap } from "@/components/route-map";
 
@@ -73,6 +73,15 @@ const routes = {
   },
 };
 
+const tripFares = [
+    { route: "Lekki-Ajah Express", pickup: "Lekki Phase 1", dropoff: "VGC", fare: 300 },
+    { route: "Lekki-Ajah Express", pickup: "Chevron", dropoff: "Ajah Bustop", fare: 250 },
+    { route: "Ikate-Sangotedo Loop", pickup: "Ikate", dropoff: "LBS", fare: 350 },
+    { route: "Ikate-Sangotedo Loop", pickup: "Jakande", dropoff: "Sangotedo Market", fare: 300 },
+    { route: "Admiralty Commuter", pickup: "Admiralty Way", dropoff: "Maroko", fare: 200 },
+    { route: "Admiralty Commuter", pickup: "Lekki Arts & Crafts Market", dropoff: "Elegushi Beach", fare: 150 },
+];
+
 export default function RoutesPage() {
     const [selectedRouteId, setSelectedRouteId] = React.useState<keyof typeof routes>("7B");
     const selectedRoute = routes[selectedRouteId];
@@ -124,6 +133,38 @@ export default function RoutesPage() {
                     </Table>
                 </CardContent>
             </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><DollarSign className="size-5 text-primary"/>Trip Fares</CardTitle>
+                    <CardDescription>
+                        Fare matrix for different pickup and drop-off points.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Route</TableHead>
+                                <TableHead>Pickup Point</TableHead>
+                                <TableHead>Drop-off Point</TableHead>
+                                <TableHead>Fare (₦)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tripFares.map((fare, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{fare.route}</TableCell>
+                                    <TableCell>{fare.pickup}</TableCell>
+                                    <TableCell>{fare.dropoff}</TableCell>
+                                    <TableCell>₦{fare.fare.toLocaleString()}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+
             <div className="grid gap-6 lg:grid-cols-5">
                 <Card className="lg:col-span-3">
                 <CardHeader className="flex flex-row items-center gap-2">
