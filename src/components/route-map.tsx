@@ -122,77 +122,76 @@ function interpolateLatLng(p1: LatLng, p2: LatLng, fraction: number): LatLng {
 export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string} | null>(null);
-    const [busPositions, setBusPositions] = useState<Record<string, LatLng>>({});
+    const [busPositions, setBusPositions] = useState<Record<string, {pos: LatLng, segmentIndex: number, segmentFraction: number}>>({});
 
     useEffect(() => {
         const activeRoutes = allRoutes.filter(r => r.status === 'Active' && r.path.length > 1);
-
-        const initialPositions: Record<string, LatLng> = {};
+    
+        const initialPositions: Record<string, {pos: LatLng, segmentIndex: number, segmentFraction: number}> = {};
         activeRoutes.forEach(route => {
-            initialPositions[route.name] = route.path[0];
+          initialPositions[route.name] = {
+            pos: route.path[0],
+            segmentIndex: 0,
+            segmentFraction: 0,
+          };
         });
         setBusPositions(initialPositions);
-
+    
         const animationInterval = setInterval(() => {
-            setBusPositions(prevPositions => {
-                const newPositions = { ...prevPositions };
-                activeRoutes.forEach(route => {
-                    const currentPos = newPositions[route.name];
-                    const path = route.path;
-
-                    // Find current segment
-                    let currentSegmentIndex = path.findIndex((p, i) => {
-                         if (i === path.length - 1) return false;
-                         const p1 = p;
-                         const p2 = path[i+1];
-                         // check if currentPos is on the segment from p1 to p2
-                         const isBetweenLat = (currentPos.lat >= Math.min(p1.lat, p2.lat) && currentPos.lat <= Math.max(p1.lat, p2.lat));
-                         const isBetweenLng = (currentPos.lng >= Math.min(p1.lng, p2.lng) && currentPos.lng <= Math.max(p1.lng, p2.lng));
-                         return isBetweenLat && isBetweenLng;
-                    });
-                    
-                    if(currentSegmentIndex === -1) {
-                        // If not found (or at the start), default to the first segment
-                        currentSegmentIndex = 0;
-                    }
-                    
-                    const startPoint = path[currentSegmentIndex];
-                    let nextPoint = path[currentSegmentIndex + 1];
-
-                    if (!nextPoint) { // Reached the end of the route
-                        newPositions[route.name] = path[0]; // Loop back to the start
-                        return;
-                    }
-
-                    // Simple fixed step for movement
-                    const step = 0.05; // Adjust for speed
-                    
-                    const totalDistLat = nextPoint.lat - startPoint.lat;
-                    const totalDistLng = nextPoint.lng - startPoint.lng;
-                    const currentDistLat = currentPos.lat - startPoint.lat;
-                    const currentDistLng = currentPos.lng - startPoint.lng;
-
-                    const fraction = Math.sqrt(currentDistLat**2 + currentDistLng**2) / Math.sqrt(totalDistLat**2 + totalDistLng**2);
-                    
-                    let newFraction = fraction + step;
-
-                    if (newFraction >= 1.0) {
-                        // Move to the next segment
-                        const nextSegmentIndex = (currentSegmentIndex + 1) % (path.length -1);
-                        newPositions[route.name] = path[nextSegmentIndex];
-                         if (currentSegmentIndex + 1 >= path.length -1) {
-                             newPositions[route.name] = path[0]
-                         }
-                    } else {
-                        newPositions[route.name] = interpolateLatLng(startPoint, nextPoint, newFraction);
-                    }
-                });
-                return newPositions;
+          setBusPositions(prevPositions => {
+            const newPositions = { ...prevPositions };
+            activeRoutes.forEach(route => {
+              const { pos, segmentIndex, segmentFraction } = newPositions[route.name];
+              const path = route.path;
+    
+              const startPoint = path[segmentIndex];
+              let endPoint = path[segmentIndex + 1];
+    
+              if (!endPoint) {
+                // End of the route, loop back
+                newPositions[route.name] = {
+                  pos: path[0],
+                  segmentIndex: 0,
+                  segmentFraction: 0,
+                };
+                return;
+              }
+    
+              const step = 0.05; // Adjust for speed
+              let newFraction = segmentFraction + step;
+    
+              if (newFraction >= 1.0) {
+                const nextSegmentIndex = segmentIndex + 1;
+                if (nextSegmentIndex >= path.length - 1) {
+                  // Reached the last point, loop back
+                  newPositions[route.name] = {
+                    pos: path[0],
+                    segmentIndex: 0,
+                    segmentFraction: 0,
+                  };
+                } else {
+                  // Move to the next segment
+                  newPositions[route.name] = {
+                    pos: path[nextSegmentIndex],
+                    segmentIndex: nextSegmentIndex,
+                    segmentFraction: 0, // newFraction - 1.0 would be more precise but 0 is simpler for looping
+                  };
+                }
+              } else {
+                // Interpolate position on current segment
+                newPositions[route.name] = {
+                  pos: interpolateLatLng(startPoint, endPoint, newFraction),
+                  segmentIndex: segmentIndex,
+                  segmentFraction: newFraction,
+                };
+              }
             });
+            return newPositions;
+          });
         }, 1000); // Update every second
-
+    
         return () => clearInterval(animationInterval);
-    }, [allRoutes]);
+      }, [allRoutes]);
 
     if (!apiKey) {
         return (
@@ -245,8 +244,9 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 )}
 
                 {allRoutes.map((route) => {
-                    if (route.status === 'Active' && busPositions[route.name]) {
-                        return <BusMarker key={`bus-${route.name}`} position={busPositions[route.name]} color={route.color} />;
+                    const busState = busPositions[route.name];
+                    if (route.status === 'Active' && busState) {
+                        return <BusMarker key={`bus-${route.name}`} position={busState.pos} color={route.color} />;
                     }
                     return null;
                 })}
