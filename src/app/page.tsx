@@ -140,6 +140,41 @@ const revenueData = {
   ],
 };
 
+const routes = {
+  "7B": {
+    name: "Lekki-Ajah Express",
+    color: "#FF5733",
+    path: [
+      { lat: 6.4474, lng: 3.4723 },
+      { lat: 6.4326, lng: 3.5028 },
+      { lat: 6.4293, lng: 3.5499 },
+      { lat: 6.4428, lng: 3.5824 },
+      { lat: 6.4599, lng: 3.5931 },
+    ],
+  },
+  "12A": {
+    name: "Ikate-Sangotedo Loop",
+    color: "#33C4FF",
+    path: [
+      { lat: 6.4333, lng: 3.4833 },
+      { lat: 6.4340, lng: 3.5132 },
+      { lat: 6.4299, lng: 3.5352 },
+      { lat: 6.4674, lng: 3.5816 },
+      { lat: 6.4950, lng: 3.5700 },
+    ],
+  },
+  "5C": {
+    name: "Admiralty Commuter",
+    color: "#8E44AD",
+    path: [
+      { lat: 6.4450, lng: 3.4699 },
+      { lat: 6.4528, lng: 3.4400 },
+      { lat: 6.4495, lng: 3.4247 },
+      { lat: 6.4297, lng: 3.4675 },
+      { lat: 6.4172, lng: 3.4688 },
+    ],
+  },
+};
 
 export default function DashboardPage() {
   const [revenueDuration, setRevenueDuration] = React.useState<keyof typeof revenueData>("30d");
@@ -249,6 +284,31 @@ export default function DashboardPage() {
                     </Card>
                   ))}
                 </div>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center gap-2">
+                      <Map className="size-5 text-primary" />
+                      <CardTitle>Pickup Locations Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                      <div className="h-[400px]">
+                        <RouteMap allRoutes={Object.values(routes)} />
+                      </div>
+                      <div className="p-4 border-t">
+                          <div className="flex flex-wrap gap-x-6 gap-y-2">
+                              {Object.values(routes).map((route) => (
+                                  <div key={route.name} className="flex items-center gap-2">
+                                      <div
+                                          className="w-3 h-3 rounded-full"
+                                          style={{ backgroundColor: route.color }}
+                                      />
+                                      <span className="text-xs font-medium">{route.name}</span>
+                                  </div>
+                              ))}
+                          </div>
+                      </div>
+                  </CardContent>
+                </Card>
 
                 <div className="grid gap-6 lg:grid-cols-2">
                   <Card>
