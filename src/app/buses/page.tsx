@@ -35,9 +35,9 @@ const vehicleStatus = [
 ];
 
 const vehicleRentals = [
-    { driver: "Kenji Tanaka", company: "Swift Logistics", cost: "₦1,200,000", startDate: "2024-07-01", endDate: "2024-09-30" },
-    { driver: "Fatima Al-Jamil", company: "Metro Drivers Inc.", cost: "₦2,500,000", startDate: "2024-06-15", endDate: "2024-12-14" },
-    { driver: "Alex Johnson", company: "City Tours Co.", cost: "₦450,000", startDate: "2024-08-01", endDate: "2024-08-31" },
+    { driver: "Kenji Tanaka", busId: "MT-1088", cost: "₦1,200,000", startDate: "2024-07-01", endDate: "2024-09-30" },
+    { driver: "Fatima Al-Jamil", busId: "MT-6002", cost: "₦2,500,000", startDate: "2024-06-15", endDate: "2024-12-14" },
+    { driver: "Alex Johnson", busId: "MT-4815", cost: "₦450,000", startDate: "2024-08-01", endDate: "2024-08-31" },
 ].map(rental => {
     const duration = differenceInDays(parseISO(rental.endDate), parseISO(rental.startDate));
     const costNumeric = Number(rental.cost.replace(/[^0-9.-]+/g, ""));
@@ -203,7 +203,7 @@ export default function BusesPage() {
                 <TableHeader>
                     <TableRow>
                         <TableHead>Outsourced Driver</TableHead>
-                        <TableHead>Hiring Company</TableHead>
+                        <TableHead>Bus ID</TableHead>
                         <TableHead>Duration (days)</TableHead>
                         <TableHead>Total Cost</TableHead>
                         <TableHead>Cost per Day</TableHead>
@@ -215,7 +215,7 @@ export default function BusesPage() {
                     {vehicleRentals.map((rental, index) => (
                         <TableRow key={index}>
                             <TableCell>{rental.driver}</TableCell>
-                            <TableCell>{rental.company}</TableCell>
+                            <TableCell>{rental.busId}</TableCell>
                             <TableCell>{rental.duration}</TableCell>
                             <TableCell>{rental.cost}</TableCell>
                             <TableCell>{rental.costPerDay}</TableCell>
