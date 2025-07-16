@@ -134,37 +134,6 @@ export default function RoutesPage() {
                 </CardContent>
             </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2"><DollarSign className="size-5 text-primary"/>Trip Fares</CardTitle>
-                    <CardDescription>
-                        Fare matrix for different pickup and drop-off points.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Route</TableHead>
-                                <TableHead>Pickup Point</TableHead>
-                                <TableHead>Drop-off Point</TableHead>
-                                <TableHead>Fare (₦)</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {tripFares.map((fare, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{fare.route}</TableCell>
-                                    <TableCell>{fare.pickup}</TableCell>
-                                    <TableCell>{fare.dropoff}</TableCell>
-                                    <TableCell>₦{fare.fare.toLocaleString()}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </CardContent>
-            </Card>
-
             <div className="grid gap-6 lg:grid-cols-5">
                 <Card className="lg:col-span-3">
                 <CardHeader className="flex flex-row items-center gap-2">
@@ -226,6 +195,39 @@ export default function RoutesPage() {
                 </CardContent>
                 </Card>
             </div>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><DollarSign className="size-5 text-primary"/>Trip Fares</CardTitle>
+                    <CardDescription>
+                        Fare matrix for different pickup and drop-off points.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Route</TableHead>
+                                <TableHead>Pickup Point</TableHead>
+                                <TableHead>Drop-off Point</TableHead>
+                                <TableHead>Fare (₦)</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {tripFares.map((fare, index) => (
+                                <TableRow key={index}>
+                                    <TableCell>{fare.route}</TableCell>
+                                    <TableCell>{fare.pickup}</TableCell>
+                                    <TableCell>{fare.dropoff}</TableCell>
+                                    <TableCell>₦{fare.fare.toLocaleString()}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
         </div>
     )
 }
+
+    
