@@ -322,7 +322,7 @@ export default function DashboardPage() {
                         <CardHeader className="flex flex-row items-center gap-2">
                             <CalendarClock className="size-5 text-primary" />
                             <CardTitle>Vehicle Maintenance</CardTitle>
-                        </CardHeader>
+                        </Header>
                         <CardContent>
                             <Table>
                                 <TableHeader><TableRow><TableHead>Bus ID</TableHead><TableHead>Task</TableHead><TableHead>Due</TableHead><TableHead>Assigned</TableHead></TableRow></TableHeader>
@@ -358,5 +358,5 @@ export default function DashboardPage() {
         </SidebarInset>
       </SidebarProvider>
     </div>
-  )
+  );
 }
