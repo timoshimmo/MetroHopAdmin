@@ -1,3 +1,5 @@
+'use client'
+
 import {
   Accordion,
   AccordionContent,
@@ -38,6 +40,13 @@ import {
   SidebarMenuSubButton,
 } from "@/components/ui/sidebar"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Table,
   TableBody,
   TableCell,
@@ -63,6 +72,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { SummarizeForm } from "@/components/summarize-form"
+import React from "react"
 
 const kpis = [
   { title: "Active Buses", value: "42", icon: Bus, change: "+5.2%" },
@@ -96,7 +106,43 @@ const outsourcedDrivers = [
     { name: "Fatima Al-Jamil", company: "Metro Drivers Inc.", contractEnd: "2025-06-30" },
 ];
 
+const routes = {
+  "7B": {
+    name: "Lekki-Ajah Express",
+    stops: [
+      { stop: 1, name: "Lekki Phase 1", time: "10:05 AM", status: "completed" },
+      { stop: 2, name: "Chevron", time: "10:12 AM", status: "completed" },
+      { stop: 3, name: "VGC", time: "10:20 AM", status: "current" },
+      { stop: 4, name: "Abraham Adesanya", time: "10:35 AM", status: "upcoming" },
+      { stop: 5, name: "Ajah Bustop", time: "10:45 AM", status: "upcoming" },
+    ],
+  },
+  "12A": {
+    name: "Ikate-Sangotedo Loop",
+    stops: [
+      { stop: 1, name: "Ikate", time: "11:00 AM", status: "completed" },
+      { stop: 2, name: "Jakande", time: "11:10 AM", status: "current" },
+      { stop: 3, name: "Igbo Efon", time: "11:20 AM", status: "upcoming" },
+      { stop: 4, name: "LBS", time: "11:35 AM", status: "upcoming" },
+      { stop: 5, name: "Sangotedo Market", time: "11:50 AM", status: "upcoming" },
+    ],
+  },
+  "5C": {
+    name: "Admiralty Commuter",
+    stops: [
+      { stop: 1, name: "Admiralty Way", time: "09:30 AM", status: "completed" },
+      { stop: 2, name: "Lekki-Ikoyi Link Bridge", time: "09:45 AM", status: "completed" },
+      { stop: 3, name: "Maroko", time: "09:55 AM", status: "completed" },
+      { stop: 4, name: "Lekki Arts & Crafts Market", time: "10:05 AM", status: "current" },
+      { stop: 5, name: "Elegushi Beach", time: "10:15 AM", status: "upcoming" },
+    ],
+  },
+};
+
 export default function DashboardPage() {
+  const [selectedRouteId, setSelectedRouteId] = React.useState<keyof typeof routes>("7B");
+  const selectedRoute = routes[selectedRouteId];
+  
   return (
     <div className="min-h-screen w-full bg-muted/40">
       <SidebarProvider>
@@ -117,7 +163,7 @@ export default function DashboardPage() {
               <SidebarMenuItem>
                 <SidebarMenuButton href="#" isActive>
                   <LayoutDashboard />
-                  Dashboard
+                  <span>Dashboard</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
@@ -223,20 +269,26 @@ export default function DashboardPage() {
                   </Card>
 
                   <Card className="lg:col-span-2">
-                    <CardHeader className="flex flex-row items-center gap-2">
-                      <ListOrdered className="size-5 text-primary" />
-                      <CardTitle>Sequential Drop-off Route</CardTitle>
+                    <CardHeader className="flex flex-row items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <ListOrdered className="size-5 text-primary" />
+                        <CardTitle>Sequential Drop-off Route</CardTitle>
+                      </div>
+                       <Select value={selectedRouteId} onValueChange={(value) => setSelectedRouteId(value as keyof typeof routes)}>
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Select a route" />
+                          </SelectTrigger>
+                          <SelectContent>
+                             {Object.entries(routes).map(([id, route]) => (
+                                <SelectItem key={id} value={id}>Route {id}: {route.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-sm text-muted-foreground mb-4">Route 7B: Lekki-Ajah Express</p>
+                        <p className="text-sm text-muted-foreground mb-4">Displaying stops for Route {selectedRouteId}: {selectedRoute.name}</p>
                         <ol className="space-y-4">
-                          {[
-                              { stop: 1, name: "Lekki Phase 1", time: "10:05 AM", status: "completed" },
-                              { stop: 2, name: "Chevron", time: "10:12 AM", status: "completed" },
-                              { stop: 3, name: "VGC", time: "10:20 AM", status: "current" },
-                              { stop: 4, name: "Abraham Adesanya", time: "10:35 AM", status: "upcoming" },
-                              { stop: 5, name: "Ajah Bustop", time: "10:45 AM", status: "upcoming" },
-                          ].map((item) => (
+                          {selectedRoute.stops.map((item) => (
                               <li key={item.stop} className="flex items-start gap-3">
                                   <div className={`flex size-8 items-center justify-center rounded-full ${item.status === 'completed' ? 'bg-primary/20 text-primary' : item.status === 'current' ? 'bg-accent text-accent-foreground' : 'bg-secondary'}`}>
                                       {item.stop}
@@ -360,3 +412,5 @@ export default function DashboardPage() {
     </div>
   );
 }
+
+    
