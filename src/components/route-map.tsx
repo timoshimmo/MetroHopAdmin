@@ -1,15 +1,26 @@
 
 'use client';
 
-import { APIProvider, Map, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
-import React, { useEffect } from 'react';
+import { APIProvider, Map, AdvancedMarker, useMap, InfoWindow } from '@vis.gl/react-google-maps';
+import React, { useEffect, useState } from 'react';
+import { BusIcon } from 'lucide-react';
+import { BusMarker } from './bus-marker';
 
 type LatLng = { lat: number; lng: number };
+
+type Stop = {
+    stop: number;
+    name: string;
+    time: string;
+    status: 'completed' | 'current' | 'upcoming';
+};
 
 type Route = {
   name: string;
   color: string;
   path: LatLng[];
+  stops?: Stop[];
+  status?: string;
 };
 
 interface RouteMapProps {
@@ -59,15 +70,14 @@ const Directions = ({ routes }: { routes: Route[] }) => {
     useEffect(() => {
         if (!map || !routes.length) return;
 
-        const directionsService = new google.maps.DirectionsService();
-        const polylines: google.maps.Polyline[] = [];
-
         routes.forEach(route => {
             if (route.path.length < 2) return;
-
+            
+            // This renderer will be replaced for each route, which is fine for this use case
+            // A more complex implementation might manage an array of renderers.
             const directionsRenderer = new google.maps.DirectionsRenderer({
                 map,
-                suppressMarkers: true, // We'll use our own AdvancedMarkers
+                suppressMarkers: true, 
                 polylineOptions: {
                     strokeColor: route.color,
                     strokeOpacity: 0.8,
@@ -82,6 +92,8 @@ const Directions = ({ routes }: { routes: Route[] }) => {
                 stopover: true,
             }));
 
+            const directionsService = new google.maps.DirectionsService();
+
             directionsService.route({
                 origin,
                 destination,
@@ -94,15 +106,8 @@ const Directions = ({ routes }: { routes: Route[] }) => {
                     console.error(`Directions request failed due to ${status} for route ${route.name}`);
                 }
             });
-
-            // Store the renderer to clean up later, though the renderer cleans itself up when map is destroyed
-            // For more complex scenarios, you might want a more robust cleanup.
         });
 
-        return () => {
-            // In this setup, DirectionsRenderer cleans up after itself when the map changes.
-            // If we were creating polylines manually from the response, we'd clear them here.
-        };
     }, [map, routes]);
 
     return null;
@@ -111,6 +116,8 @@ const Directions = ({ routes }: { routes: Route[] }) => {
 
 export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string} | null>(null);
+
     if (!apiKey) {
         return (
             <div className="flex h-full w-full items-center justify-center bg-muted">
@@ -130,20 +137,55 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 styles={mapStyles}
                 disableDefaultUI={true}
                 gestureHandling={'greedy'}
+                onClick={() => setSelectedStop(null)}
             >
                 <Directions routes={allRoutes} />
-                 {allRoutes.flatMap(route => route.path.map((pos, index) => (
-                    <AdvancedMarker key={`${route.name}-${index}`} position={pos}>
-                        <div style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            backgroundColor: route.color,
-                            border: '2px solid white',
-                            boxShadow: '0 0 5px rgba(0,0,0,0.5)'
-                        }} />
-                    </AdvancedMarker>
-                )))}
+                
+                {allRoutes.flatMap(route => 
+                    (route.stops || route.path).map((stopOrPos, index) => {
+                        const position = 'lat' in stopOrPos ? stopOrPos : { lat: 0, lng: 0 }; // Fallback for path items
+                        const stop = route.stops ? route.stops[index] : null;
+                        const pos = stop ? route.path[index] : position;
+                        const name = stop ? stop.name : `Point ${index + 1}`;
+
+                        return (
+                            <AdvancedMarker 
+                                key={`${route.name}-${index}`} 
+                                position={pos}
+                                onClick={() => setSelectedStop({route, stop: pos, name})}
+                            >
+                                <div style={{
+                                    width: 12,
+                                    height: 12,
+                                    borderRadius: '50%',
+                                    backgroundColor: route.color,
+                                    border: '2px solid white',
+                                    boxShadow: '0 0 5px rgba(0,0,0,0.5)',
+                                    cursor: 'pointer'
+                                }} />
+                            </AdvancedMarker>
+                        )
+                    })
+                )}
+
+                {allRoutes.map((route, index) => {
+                    if (route.status === 'Active' && route.path.length > 0) {
+                        return <BusMarker key={`bus-${index}`} position={route.path[0]} color={route.color} />;
+                    }
+                    return null;
+                })}
+
+                {selectedStop && (
+                    <InfoWindow
+                        position={selectedStop.stop}
+                        onCloseClick={() => setSelectedStop(null)}
+                    >
+                        <div className="p-1">
+                            <h3 className="font-semibold">{selectedStop.name}</h3>
+                            <p className="text-xs text-muted-foreground">{selectedStop.route.name}</p>
+                        </div>
+                    </InfoWindow>
+                )}
             </Map>
         </APIProvider>
     );

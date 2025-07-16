@@ -144,6 +144,7 @@ const routes = {
   "7B": {
     name: "Lekki-Ajah Express",
     color: "#FF5733",
+    status: "Active",
     path: [
       { lat: 6.4474, lng: 3.4723 },
       { lat: 6.4326, lng: 3.5028 },
@@ -155,6 +156,7 @@ const routes = {
   "12A": {
     name: "Ikate-Sangotedo Loop",
     color: "#33C4FF",
+    status: "Active",
     path: [
       { lat: 6.4333, lng: 3.4833 },
       { lat: 6.4340, lng: 3.5132 },
@@ -166,6 +168,7 @@ const routes = {
   "5C": {
     name: "Admiralty Commuter",
     color: "#8E44AD",
+    status: "Inactive",
     path: [
       { lat: 6.4450, lng: 3.4699 },
       { lat: 6.4528, lng: 3.4400 },
