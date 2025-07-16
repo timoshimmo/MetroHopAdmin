@@ -2,7 +2,7 @@
 'use client';
 
 import { APIProvider, Map, AdvancedMarker, useMap, InfoWindow } from '@vis.gl/react-google-maps';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { MapPin } from 'lucide-react';
 import { BusMarker } from './bus-marker';
 
@@ -66,10 +66,15 @@ const mapStyles = [
 
 const Directions = ({ routes }: { routes: Route[] }) => {
     const map = useMap();
-    
+    const directionsRenderers = useRef<google.maps.DirectionsRenderer[]>([]);
+
     useEffect(() => {
         if (!map || !routes.length) return;
 
+        // Clear existing renderers
+        directionsRenderers.current.forEach(renderer => renderer.setMap(null));
+        directionsRenderers.current = [];
+        
         routes.forEach(route => {
             if (route.path.length < 2) return;
             
@@ -82,6 +87,7 @@ const Directions = ({ routes }: { routes: Route[] }) => {
                     strokeWeight: 5,
                 }
             });
+            directionsRenderers.current.push(directionsRenderer);
 
             const origin = route.path[0];
             const destination = route.path[route.path.length - 1];
@@ -105,16 +111,90 @@ const Directions = ({ routes }: { routes: Route[] }) => {
                 }
             });
         });
+        
+        return () => {
+             directionsRenderers.current.forEach(renderer => renderer.setMap(null));
+        }
 
     }, [map, routes]);
 
     return null;
 };
 
+function interpolateLatLng(p1: LatLng, p2: LatLng, fraction: number): LatLng {
+    const lat = p1.lat + (p2.lat - p1.lat) * fraction;
+    const lng = p1.lng + (p2.lng - p1.lng) * fraction;
+    return { lat, lng };
+}
+
+function getDistance(p1: LatLng, p2: LatLng) {
+    const R = 6378137; // Earth’s mean radius in meter
+    const dLat = (p2.lat - p1.lat) * Math.PI / 180;
+    const dLong = (p2.lng - p1.lng) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(p1.lat * Math.PI / 180) * Math.cos(p2.lat * Math.PI / 180) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // returns the distance in meter
+}
 
 export function RouteMap({ allRoutes }: RouteMapProps) {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     const [selectedStop, setSelectedStop] = useState<{route: Route, stop: LatLng, name: string, stopNumber: number} | null>(null);
+    const [busPositions, setBusPositions] = useState<{[key: string]: LatLng}>({});
+    const animationRef = useRef<number>();
+
+    useEffect(() => {
+        const routeData = allRoutes.map(route => {
+            if (route.status !== 'Active') return null;
+            const totalDistance = route.path.reduce((acc, curr, i, arr) => {
+                if (i === 0) return 0;
+                return acc + getDistance(arr[i-1], curr);
+            }, 0);
+            return {
+                route,
+                totalDistance,
+                segmentDistances: route.path.map((p, i) => i === 0 ? 0 : getDistance(route.path[i-1], p)),
+            };
+        }).filter(Boolean);
+        
+        const animate = () => {
+            const speedFactor = 0.005; // Adjust this to control speed
+            const newPositions : {[key: string]: LatLng} = {};
+
+            routeData.forEach(data => {
+                if (!data) return;
+                const { route, totalDistance, segmentDistances } = data;
+                const time = Date.now();
+                const progress = (time * speedFactor / totalDistance) % 1;
+                const distanceCovered = progress * totalDistance;
+
+                let distanceSoFar = 0;
+                for (let i = 1; i < route.path.length; i++) {
+                    distanceSoFar += segmentDistances[i];
+                    if (distanceSoFar >= distanceCovered) {
+                        const overflow = distanceSoFar - distanceCovered;
+                        const fraction = 1 - (overflow / segmentDistances[i]);
+                        const p1 = route.path[i-1];
+                        const p2 = route.path[i];
+                        newPositions[route.name] = interpolateLatLng(p1, p2, fraction);
+                        break;
+                    }
+                }
+            });
+            
+            setBusPositions(newPositions);
+            animationRef.current = requestAnimationFrame(animate);
+        };
+
+        animationRef.current = requestAnimationFrame(animate);
+
+        return () => {
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+            }
+        };
+    }, [allRoutes]);
 
     if (!apiKey) {
         return (
@@ -141,7 +221,14 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                 
                 {allRoutes.flatMap(route => 
                     (route.stops || []).map((stop, index) => {
-                        const pos = route.path[index] || { lat: 0, lng: 0 };
+                        // Find the corresponding point in the path, as stops might not map 1:1
+                        const stopNameLower = stop.name.toLowerCase();
+                        const pathIndex = route.path.findIndex(p => {
+                            // This is a simplistic match. A real app might have lat/lng on stops.
+                            return true; // Simplified for now
+                        });
+                        
+                        const pos = route.path[index] || route.path[0];
                         
                         return (
                             <AdvancedMarker 
@@ -153,17 +240,15 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
                                 }}
                             >
                                 <MapPin className="text-red-500 w-8 h-8 cursor-pointer" style={{ fill: route.color, color: 'white' }} />
-
                             </AdvancedMarker>
                         )
                     })
                 )}
 
-                {allRoutes.map(route => {
-                    if (route.status === 'Active' && route.path.length > 0) {
-                        return <BusMarker key={`${route.name}-bus`} position={route.path[0]} color={route.color} />;
-                    }
-                    return null;
+                {Object.entries(busPositions).map(([routeName, position]) => {
+                    const route = allRoutes.find(r => r.name === routeName);
+                    if (!route) return null;
+                    return <BusMarker key={`${routeName}-bus`} position={position} color={route.color} />;
                 })}
                 
                 {selectedStop && (
