@@ -72,6 +72,7 @@ import {
   LogOut,
   Map,
   Route,
+  Settings,
   Users,
   Wrench,
 } from "lucide-react"
@@ -257,7 +258,10 @@ export default function DashboardPage() {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/support" className="flex items-center">
                     <Headset className="mr-2 h-4 w-4" />
