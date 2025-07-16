@@ -1,6 +1,7 @@
 
 'use client'
 
+import React, { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,10 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Headset, PlusCircle } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 
-const supportCases = [
+const initialSupportCases = [
   { id: "C-1024", customer: "Adebayo Adekunle", date: "2024-08-01", type: "Complaint", details: "Bus MT-3401 was 20 minutes late.", status: "Resolved", assignedTo: "Support Team A" },
   { id: "C-1025", customer: "Chioma Okeke", date: "2024-08-01", type: "Feedback", details: "Driver was very courteous and helpful.", status: "Closed", assignedTo: "N/A" },
   { id: "C-1026", customer: "Tunde Bakare", date: "2024-08-02", type: "Complaint", details: "A/C was not working on bus MT-2198.", status: "In Progress", assignedTo: "Maintenance" },
@@ -23,15 +22,41 @@ const supportCases = [
 ];
 
 export default function SupportPage() {
-  const router = useRouter();
+  const [supportCases, setSupportCases] = useState(initialSupportCases);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newCase, setNewCase] = useState({
+    customerName: "",
+    caseType: "",
+    details: "",
+    assignedTo: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setNewCase(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSelectChange = (id: string, value: string) => {
+    setNewCase(prev => ({ ...prev, [id]: value }));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real application, you would handle form submission here.
-    // For this demo, we'll just close the dialog by reloading (a better implementation would use state).
-    router.refresh();
+    if (newCase.customerName && newCase.caseType && newCase.details && newCase.assignedTo) {
+      const newEntry = {
+        id: `C-${Math.floor(Math.random() * 9000) + 1029}`,
+        customer: newCase.customerName,
+        date: new Date().toISOString().split('T')[0],
+        type: newCase.caseType,
+        details: newCase.details,
+        status: "Open",
+        assignedTo: newCase.assignedTo,
+      };
+      setSupportCases(prev => [newEntry, ...prev]);
+      setNewCase({ customerName: "", caseType: "", details: "", assignedTo: "" });
+      setIsDialogOpen(false);
+    }
   };
-
 
   return (
     <div className="grid gap-6">
@@ -43,7 +68,7 @@ export default function SupportPage() {
                     Track and manage customer complaints and feedback.
                 </CardDescription>
             </div>
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                     <PlusCircle className="mr-2" />
@@ -60,12 +85,12 @@ export default function SupportPage() {
                 <form onSubmit={handleSubmit} className="space-y-6 py-4">
                   <div className="space-y-2">
                     <Label htmlFor="customerName">Customer Name</Label>
-                    <Input id="customerName" placeholder="Enter customer's full name" required />
+                    <Input id="customerName" placeholder="Enter customer's full name" required value={newCase.customerName} onChange={handleInputChange} />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="caseType">Case Type</Label>
-                    <Select required>
+                    <Select required onValueChange={(value) => handleSelectChange('caseType', value)} value={newCase.caseType}>
                       <SelectTrigger id="caseType">
                         <SelectValue placeholder="Select case type" />
                       </SelectTrigger>
@@ -79,12 +104,12 @@ export default function SupportPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="details">Case Details</Label>
-                    <Textarea id="details" placeholder="Provide a detailed description of the case." rows={6} required />
+                    <Textarea id="details" placeholder="Provide a detailed description of the case." rows={6} required value={newCase.details} onChange={handleInputChange}/>
                   </div>
 
                   <div className="space-y-2">
                       <Label htmlFor="assignedTo">Assign To</Label>
-                      <Select required>
+                      <Select required onValueChange={(value) => handleSelectChange('assignedTo', value)} value={newCase.assignedTo}>
                           <SelectTrigger id="assignedTo">
                               <SelectValue placeholder="Assign to a team" />
                           </SelectTrigger>
