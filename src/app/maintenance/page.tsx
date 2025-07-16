@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Fuel, PlusCircle, Wrench } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FuelConsumptionChart } from "@/components/fuel-consumption-chart";
 import { Textarea } from "@/components/ui/textarea";
 
-const maintenanceHistory = [
+const initialMaintenanceHistory = [
   { id: "M-98712", busId: "MT-3401", date: "2024-07-15", task: "Oil Change", cost: 15000, status: "Completed" },
   { id: "M-98713", busId: "MT-2198", date: "2024-07-20", task: "Brake Pad Replacement", cost: 45000, status: "Completed" },
   { id: "M-98714", busId: "MT-5527", date: "2024-07-29", task: "Engine Diagnostics", cost: 20000, status: "In Progress" },
@@ -31,7 +31,7 @@ const fuelData = [
   { busId: "MT-1088", date: "2024-07-28", kmDriven: 120.0, fuelAdded: 25.0, mpg: 4.80 },
 ];
 
-const allBuses = Array.from(new Set(maintenanceHistory.map(b => b.busId).concat(fuelData.map(f => f.busId))));
+const allBuses = Array.from(new Set(initialMaintenanceHistory.map(b => b.busId).concat(fuelData.map(f => f.busId))));
 
 const fuelConsumptionData = {
   "7d": [
@@ -63,6 +63,42 @@ const fuelConsumptionData = {
 
 export default function MaintenancePage() {
   const [fuelDuration, setFuelDuration] = React.useState<keyof typeof fuelConsumptionData>("30d");
+  const [maintenanceHistory, setMaintenanceHistory] = useState(initialMaintenanceHistory);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newRecord, setNewRecord] = useState({
+    busId: "",
+    date: "",
+    task: "",
+    cost: "",
+    status: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setNewRecord(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleSelectChange = (id: string, value: string) => {
+    setNewRecord(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handleAddRecord = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newRecord.busId && newRecord.date && newRecord.task && newRecord.cost && newRecord.status) {
+      const newEntry = {
+        id: `M-${Math.floor(Math.random() * 90000) + 10000}`,
+        busId: newRecord.busId,
+        date: newRecord.date,
+        task: newRecord.task,
+        cost: Number(newRecord.cost),
+        status: newRecord.status,
+      };
+      setMaintenanceHistory(prev => [newEntry, ...prev]);
+      setNewRecord({ busId: "", date: "", task: "", cost: "", status: "" });
+      setIsDialogOpen(false);
+    }
+  };
+
 
   return (
     <div className="grid gap-6">
@@ -74,7 +110,7 @@ export default function MaintenancePage() {
                         Track and manage all vehicle maintenance activities.
                     </CardDescription>
                 </div>
-                <Dialog>
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button>
                             <PlusCircle className="mr-2" />
@@ -88,49 +124,51 @@ export default function MaintenancePage() {
                                 Fill in the details below to add a new maintenance record.
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="busId" className="text-right">Bus ID</Label>
-                                <Select>
-                                    <SelectTrigger id="busId" className="col-span-3">
-                                        <SelectValue placeholder="Select a bus" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {allBuses.map(busId => (
-                                            <SelectItem key={busId} value={busId}>{busId}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="date" className="text-right">Date</Label>
-                                <Input id="date" type="date" className="col-span-3" />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="task" className="text-right">Task</Label>
-                                <Input id="task" placeholder="e.g. Oil Change" className="col-span-3" />
-                            </div>
-                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="cost" className="text-right">Cost (₦)</Label>
-                                <Input id="cost" type="number" placeholder="e.g. 15000" className="col-span-3" />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="status" className="text-right">Status</Label>
-                                <Select>
-                                    <SelectTrigger id="status" className="col-span-3">
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Scheduled">Scheduled</SelectItem>
-                                        <SelectItem value="In Progress">In Progress</SelectItem>
-                                        <SelectItem value="Completed">Completed</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button type="submit">Add Record</Button>
-                        </DialogFooter>
+                        <form onSubmit={handleAddRecord}>
+                          <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="busId" className="text-right">Bus ID</Label>
+                                  <Select value={newRecord.busId} onValueChange={(value) => handleSelectChange('busId', value)}>
+                                      <SelectTrigger id="busId" className="col-span-3">
+                                          <SelectValue placeholder="Select a bus" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                          {allBuses.map(busId => (
+                                              <SelectItem key={busId} value={busId}>{busId}</SelectItem>
+                                          ))}
+                                      </SelectContent>
+                                  </Select>
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="date" className="text-right">Date</Label>
+                                  <Input id="date" type="date" className="col-span-3" value={newRecord.date} onChange={handleInputChange} />
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="task" className="text-right">Task</Label>
+                                  <Input id="task" placeholder="e.g. Oil Change" className="col-span-3" value={newRecord.task} onChange={handleInputChange} />
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="cost" className="text-right">Cost (₦)</Label>
+                                  <Input id="cost" type="number" placeholder="e.g. 15000" className="col-span-3" value={newRecord.cost} onChange={handleInputChange} />
+                              </div>
+                              <div className="grid grid-cols-4 items-center gap-4">
+                                  <Label htmlFor="status" className="text-right">Status</Label>
+                                  <Select value={newRecord.status} onValueChange={(value) => handleSelectChange('status', value)}>
+                                      <SelectTrigger id="status" className="col-span-3">
+                                          <SelectValue placeholder="Select status" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                          <SelectItem value="Scheduled">Scheduled</SelectItem>
+                                          <SelectItem value="In Progress">In Progress</SelectItem>
+                                          <SelectItem value="Completed">Completed</SelectItem>
+                                      </SelectContent>
+                                  </Select>
+                              </div>
+                          </div>
+                          <DialogFooter>
+                              <Button type="submit">Add Record</Button>
+                          </DialogFooter>
+                        </form>
                     </DialogContent>
                 </Dialog>
             </CardHeader>
