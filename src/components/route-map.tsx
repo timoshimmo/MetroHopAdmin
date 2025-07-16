@@ -159,27 +159,28 @@ export function RouteMap({ allRoutes }: RouteMapProps) {
         }).filter(Boolean);
         
         const animate = () => {
-            const speedFactor = 0.005; // Adjust this to control speed
+            const speedFactor = 0.00000002; // Increased speed factor
             const newPositions : {[key: string]: LatLng} = {};
 
             routeData.forEach(data => {
                 if (!data) return;
                 const { route, totalDistance, segmentDistances } = data;
                 const time = Date.now();
-                const progress = (time * speedFactor / totalDistance) % 1;
+                const progress = (time * speedFactor * totalDistance) % 1;
                 const distanceCovered = progress * totalDistance;
 
                 let distanceSoFar = 0;
                 for (let i = 1; i < route.path.length; i++) {
-                    distanceSoFar += segmentDistances[i];
-                    if (distanceSoFar >= distanceCovered) {
-                        const overflow = distanceSoFar - distanceCovered;
-                        const fraction = 1 - (overflow / segmentDistances[i]);
+                    const segmentLength = segmentDistances[i];
+                    if (distanceSoFar + segmentLength >= distanceCovered) {
+                        const overflow = distanceCovered - distanceSoFar;
+                        const fraction = overflow / segmentLength;
                         const p1 = route.path[i-1];
                         const p2 = route.path[i];
                         newPositions[route.name] = interpolateLatLng(p1, p2, fraction);
                         break;
                     }
+                    distanceSoFar += segmentLength;
                 }
             });
             
