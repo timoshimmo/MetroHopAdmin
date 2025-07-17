@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Briefcase, Bus, CircleDot, PlusCircle, Wrench, Zap } from "lucide-react";
+import { Briefcase, Bus, CircleDot, PlusCircle, Wrench, Zap, User, MapPin, Percent, Users as UsersIcon } from "lucide-react";
 import { differenceInDays, parseISO } from 'date-fns';
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -188,64 +188,65 @@ export default function BusesPage() {
               </CardDescription>
           </CardHeader>
           <CardContent>
-              <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Bus ID</TableHead>
-                          <TableHead>Assigned Driver</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Current Assignment</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {dailyOperations.map((op) => (
-                          <TableRow key={op.busId}>
-                              <TableCell>{op.busId}</TableCell>
-                              <TableCell>{op.driver}</TableCell>
-                              <TableCell>
-                                  <Badge variant={op.status === 'On Route' ? 'default' : op.status === 'Available' ? 'secondary' : 'destructive'}  className={op.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>
-                                      {op.status}
-                                  </Badge>
-                              </TableCell>
-                              <TableCell>{op.assignment}</TableCell>
-                          </TableRow>
-                      ))}
-                  </TableBody>
-              </Table>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {dailyOperations.map((op) => (
+                <Card key={op.busId}>
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-base font-semibold">{op.busId}</CardTitle>
+                    <CardDescription>{op.assignment}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Driver:</span>
+                      <span>{op.driver}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground">Status:</span>
+                      <Badge variant={op.status === 'On Route' ? 'default' : op.status === 'Available' ? 'secondary' : 'destructive'}  className={op.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>
+                          {op.status}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </CardContent>
       </Card>
       <Card>
-          <CardHeader className="flex flex-row items-center gap-2">
-              <Bus className="size-5 text-primary"/>
-              <CardTitle>Live Vehicle Status</CardTitle>
+          <CardHeader>
+              <CardTitle className="flex items-center gap-2"><Bus className="size-5 text-primary"/>Live Vehicle Status</CardTitle>
           </CardHeader>
           <CardContent>
-              <Table>
-              <TableHeader>
-                  <TableRow>
-                  <TableHead>Bus ID</TableHead>
-                  <TableHead>Driver</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Occupancy</TableHead>
-                  <TableHead>Seat Capacity</TableHead>
-                  </TableRow>
-              </TableHeader>
-              <TableBody>
-                  {vehicleStatus.map((vehicle) => (
-                  <TableRow key={vehicle.id}>
-                      <TableCell className="font-medium">{vehicle.id}</TableCell>
-                      <TableCell>{vehicle.driver}</TableCell>
-                      <TableCell>{vehicle.location}</TableCell>
-                      <TableCell>
-                      <Badge variant={vehicle.status === 'On Route' ? 'default' : vehicle.status === 'Idle' ? 'secondary' : 'destructive'} className={vehicle.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>{vehicle.status}</Badge>
-                      </TableCell>
-                      <TableCell>{vehicle.occupancy}</TableCell>
-                      <TableCell>{vehicle.seatCapacity}</TableCell>
-                  </TableRow>
-                  ))}
-              </TableBody>
-              </Table>
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {vehicleStatus.map((vehicle) => (
+                  <Card key={vehicle.id}>
+                    <CardHeader>
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="text-base font-bold">{vehicle.id}</CardTitle>
+                             <Badge variant={vehicle.status === 'On Route' ? 'default' : vehicle.status === 'Idle' ? 'secondary' : 'destructive'} className={vehicle.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>{vehicle.status}</Badge>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="space-y-2 text-sm">
+                       <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-medium">{vehicle.driver}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                           <MapPin className="w-4 h-4 text-muted-foreground" />
+                           <span className="text-muted-foreground">{vehicle.location}</span>
+                        </div>
+                       <div className="flex items-center gap-2">
+                           <Percent className="w-4 h-4 text-muted-foreground" />
+                           <span className="text-muted-foreground">Occupancy: {vehicle.occupancy}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <UsersIcon className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">{vehicle.seatCapacity}</span>
+                        </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
           </CardContent>
       </Card>
 
