@@ -11,6 +11,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const initialBusDetails = [
   { busId: "MT-3401", name: "Lekki Express", color: "Red-Orange", plateNumber: "LND-101AB" },
@@ -180,75 +181,81 @@ export default function BusesPage() {
           </CardContent>
       </Card>
 
-      <Card>
-          <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Bus className="size-5 text-primary"/>Daily Operations</CardTitle>
-              <CardDescription>
-                  Overview of available buses and assigned drivers for today's operations.
-              </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {dailyOperations.map((op) => (
-                <Card key={op.busId}>
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-base font-semibold">{op.busId}</CardTitle>
-                    <CardDescription>{op.assignment}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex flex-col gap-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Driver:</span>
-                      <span>{op.driver}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Status:</span>
-                      <Badge variant={op.status === 'On Route' ? 'default' : op.status === 'Available' ? 'secondary' : 'destructive'}  className={op.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>
-                          {op.status}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-      </Card>
-      <Card>
-          <CardHeader>
-              <CardTitle className="flex items-center gap-2"><Bus className="size-5 text-primary"/>Live Vehicle Status</CardTitle>
-          </CardHeader>
-          <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {vehicleStatus.map((vehicle) => (
-                  <Card key={vehicle.id}>
-                    <CardHeader>
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-base font-bold">{vehicle.id}</CardTitle>
-                             <Badge variant={vehicle.status === 'On Route' ? 'default' : vehicle.status === 'Idle' ? 'secondary' : 'destructive'} className={vehicle.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>{vehicle.status}</Badge>
-                        </div>
-                    </CardHeader>
-                    <CardContent className="space-y-2 text-sm">
-                       <div className="flex items-center gap-2">
-                          <User className="w-4 h-4 text-muted-foreground" />
-                          <span className="font-medium">{vehicle.driver}</span>
-                        </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Bus className="size-5 text-primary"/>Daily Operations</CardTitle>
+                <CardDescription>
+                    Overview of available buses and assigned drivers for today's operations.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-72">
+                  <div className="space-y-4">
+                    {dailyOperations.map((op) => (
+                      <Card key={op.busId}>
+                        <CardHeader className="pb-4">
+                          <CardTitle className="text-base font-semibold">{op.busId}</CardTitle>
+                          <CardDescription>{op.assignment}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col gap-2 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Driver:</span>
+                            <span>{op.driver}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">Status:</span>
+                            <Badge variant={op.status === 'On Route' ? 'default' : op.status === 'Available' ? 'secondary' : 'destructive'}  className={op.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>
+                                {op.status}
+                            </Badge>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+              </ScrollArea>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Bus className="size-5 text-primary"/>Live Vehicle Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-72">
+                <div className="space-y-4">
+                  {vehicleStatus.map((vehicle) => (
+                    <Card key={vehicle.id}>
+                      <CardHeader>
+                          <div className="flex items-center justify-between">
+                              <CardTitle className="text-base font-bold">{vehicle.id}</CardTitle>
+                              <Badge variant={vehicle.status === 'On Route' ? 'default' : vehicle.status === 'Idle' ? 'secondary' : 'destructive'} className={vehicle.status === 'On Route' ? 'bg-green-600/20 text-green-800' : ''}>{vehicle.status}</Badge>
+                          </div>
+                      </CardHeader>
+                      <CardContent className="space-y-2 text-sm">
                         <div className="flex items-center gap-2">
-                           <MapPin className="w-4 h-4 text-muted-foreground" />
-                           <span className="text-muted-foreground">{vehicle.location}</span>
-                        </div>
-                       <div className="flex items-center gap-2">
-                           <Percent className="w-4 h-4 text-muted-foreground" />
-                           <span className="text-muted-foreground">Occupancy: {vehicle.occupancy}</span>
-                        </div>
+                            <User className="w-4 h-4 text-muted-foreground" />
+                            <span className="font-medium">{vehicle.driver}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">{vehicle.location}</span>
+                          </div>
                         <div className="flex items-center gap-2">
-                            <UsersIcon className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-muted-foreground">{vehicle.seatCapacity}</span>
-                        </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-          </CardContent>
-      </Card>
+                            <Percent className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-muted-foreground">Occupancy: {vehicle.occupancy}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                              <UsersIcon className="w-4 h-4 text-muted-foreground" />
+                              <span className="text-muted-foreground">{vehicle.seatCapacity}</span>
+                          </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
